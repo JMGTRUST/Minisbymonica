@@ -1,0 +1,197 @@
+/* Minis by Mónica — estilos. Móvil primero: la vista de visitas la usa el chofer en su teléfono. */
+:root {
+  --rosa: #d94f79;
+  --rosa-oscuro: #b83a62;
+  --crema: #fdf6f0;
+  --tinta: #3a2e35;
+  --suave: #8a7a81;
+  --borde: #eadfe4;
+  --ok: #2e7d4f;
+  --ok-fondo: #e3f4ea;
+  --alerta: #a66a00;
+  --alerta-fondo: #fdf1d8;
+  --error: #b3261e;
+  --error-fondo: #fbe9e7;
+  --azul-fondo: #e8f0fe;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--crema);
+  color: var(--tinta);
+  font-size: 16px;
+}
+
+/* ---------- Cabecera y navegacion ---------- */
+.cabecera {
+  background: #fff;
+  border-bottom: 2px solid var(--rosa);
+  padding: 12px 16px 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.marca { display: flex; align-items: center; gap: 10px; }
+.logo { font-size: 34px; }
+.marca h1 { margin: 0; font-size: 20px; color: var(--rosa-oscuro); }
+.marca p { margin: 0; font-size: 13px; color: var(--suave); }
+.nav { display: flex; gap: 4px; overflow-x: auto; padding: 10px 0 0; }
+.tab {
+  border: none;
+  background: none;
+  padding: 10px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+  color: var(--tinta);
+}
+.tab.activo { border-bottom-color: var(--rosa); font-weight: 700; color: var(--rosa-oscuro); }
+
+main { max-width: 1100px; margin: 0 auto; padding: 16px; }
+
+.pie { text-align: center; color: var(--suave); font-size: 12px; padding: 20px 16px 30px; }
+
+/* ---------- Tarjetas y KPIs ---------- */
+.card {
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.card h3 { margin-top: 0; }
+
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.kpi { background: #fff; border: 1px solid var(--borde); border-radius: 12px; padding: 14px; }
+.kpi-valor { font-size: 22px; font-weight: 800; color: var(--rosa-oscuro); }
+.kpi-nombre { font-size: 13px; color: var(--suave); margin-top: 4px; }
+
+/* ---------- Tablas ---------- */
+.tabla { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tabla th, .tabla td { padding: 8px 6px; border-bottom: 1px solid var(--borde); text-align: left; vertical-align: middle; }
+.tabla th { color: var(--suave); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; }
+.num { text-align: right !important; }
+.centro { text-align: center !important; }
+.celda-suave { color: var(--suave); font-size: 13px; }
+.celda-tienda { white-space: nowrap; }
+.fila-chofer td { background: var(--crema); font-weight: 700; color: var(--rosa-oscuro); }
+.fila-alerta td { background: var(--alerta-fondo); }
+.fila-inactiva td { opacity: 0.5; }
+.scroll-x { overflow-x: auto; }
+.tabla-despacho .th-vert span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  max-height: 130px;
+  display: inline-block;
+  font-size: 11px;
+}
+
+/* ---------- Controles ---------- */
+input, select, textarea {
+  font: inherit;
+  padding: 8px;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--tinta);
+  max-width: 100%;
+}
+textarea { width: 100%; }
+input[type="checkbox"] { width: 18px; height: 18px; }
+.input-num { width: 70px; text-align: right; }
+.input-corto { width: 70px; }
+.input-grande { font-size: 20px; padding: 12px; width: 90px; }
+.criterio-par { background: var(--azul-fondo); }
+
+.btn {
+  display: inline-block;
+  font: inherit;
+  font-size: 14px;
+  padding: 10px 16px;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  margin: 6px 6px 0 0;
+  color: var(--tinta);
+}
+.btn:hover { border-color: var(--rosa); }
+.btn-primario { background: var(--rosa); border-color: var(--rosa); color: #fff; font-weight: 700; }
+.btn-primario:hover { background: var(--rosa-oscuro); }
+.btn-mini { padding: 5px 10px; font-size: 13px; margin: 0 4px 0 0; }
+.btn-grande { width: 100%; padding: 16px; font-size: 18px; margin-top: 12px; }
+.btn-listo { background: var(--ok); border-color: var(--ok); }
+.btn-peligro { border-color: var(--error); color: var(--error); }
+.acciones { white-space: nowrap; }
+
+.tabs-mini { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.tab-mini {
+  font: inherit;
+  font-size: 13px;
+  padding: 8px 12px;
+  border: 1px solid var(--borde);
+  border-radius: 20px;
+  background: #fff;
+  cursor: pointer;
+}
+.tab-mini.activo { background: var(--rosa); border-color: var(--rosa); color: #fff; font-weight: 700; }
+
+/* ---------- Estados y avisos ---------- */
+.pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  background: var(--borde);
+  white-space: nowrap;
+}
+.pill-ok { background: var(--ok-fondo); color: var(--ok); }
+.pill-warn { background: var(--alerta-fondo); color: var(--alerta); }
+.pill-error { background: var(--error-fondo); color: var(--error); }
+
+.ayuda { color: var(--suave); font-size: 13px; }
+.ok { color: var(--ok); }
+.error { color: var(--error); background: var(--error-fondo); padding: 10px; border-radius: 8px; }
+.fila-fecha { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+.progreso { height: 12px; background: var(--borde); border-radius: 6px; overflow: hidden; }
+.progreso-barra { height: 100%; background: var(--ok); transition: width 0.2s; }
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--tinta);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 24px;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 100;
+}
+.toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------- Impresion de hojas de reparto ---------- */
+.solo-imprimir { display: none; }
+@media print {
+  .no-imprimir { display: none !important; }
+  .solo-imprimir { display: block; }
+  body { background: #fff; }
+  .hoja { page-break-after: always; }
+  .hoja h2 { font-size: 18px; }
+  .hoja table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .hoja th, .hoja td { border: 1px solid #999; padding: 5px; text-align: left; }
+  .hoja td.num { text-align: right; }
+}
+
+/* ---------- Movil ---------- */
+@media (max-width: 640px) {
+  main { padding: 10px; }
+  .tabla th, .tabla td { padding: 7px 4px; }
+  .kpi-valor { font-size: 18px; }
+}

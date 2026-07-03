@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minis by Mónica — Ventas y reparto en tiempo real</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧁</text></svg>">
+</head>
+<body>
+  <header class="cabecera no-imprimir">
+    <div class="marca">
+      <span class="logo">🧁</span>
+      <div>
+        <h1>Minis by Mónica</h1>
+        <p>Sistema de ventas y reparto en tiempo real</p>
+      </div>
+    </div>
+    <nav id="nav" class="nav"></nav>
+  </header>
+
+  <main id="vista" class="no-imprimir"></main>
+
+  <!-- Hojas de reparto/produccion: solo visibles al imprimir -->
+  <div id="area-impresion" class="solo-imprimir"></div>
+
+  <footer class="pie no-imprimir">
+    Piloto — The Trust for the Americas · Los datos se guardan en este dispositivo; descarga respaldos desde la pestaña “Datos”.
+  </footer>
+
+  <script src="js/util.js"></script>
+  <script src="js/seed.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/panel.js"></script>
+  <script src="js/despacho.js"></script>
+  <script src="js/visitas.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/datos.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+# Minis by Mónica — Sistema de ventas y reparto en tiempo real
+
+Piloto desarrollado por **The Trust for the Americas** a partir del diagnóstico realizado con
+Mónica Quiñones (2 de julio de 2026). Es la solución que la empresa priorizó: sustituir la
+digitación manual del Excel de despacho y las fotos de inventario en WhatsApp por un solo
+sistema con visibilidad en tiempo real.
+
+> *"Cada mercancía que ellos dejan allá, consignación, ellos la ven como mercancía,
+> pero yo la veo traducida en dinero."* — El panel muestra exactamente eso: cuánto
+> dinero hay en cada tienda.
+
+## Qué resuelve
+
+| Dolor del diagnóstico | Cómo lo resuelve la herramienta |
+| --- | --- |
+| **Despacho diario manual** (~1 h 30 min digitando ventas de 18 productos en 28 tiendas) | **Componente A — Motor de despacho:** el reporte de ventas se pega desde Excel o se sube como CSV; el sistema lo lee, calcula cuánto reponer por tienda y genera la relación de despacho por chofer y la hoja de producción, listas para imprimir. |
+| **Inventario en tienda incompleto** ("hacen el inventario de 7, pero los otros no...") | **Componente B — Visita de chofer:** formulario móvil que **no permite cerrar la visita hasta contar los 13 productos** (el 0 hay que digitarlo). Cada visita queda registrada con fecha y hora. |
+| **Fotos en grupos de WhatsApp que se borran** | Todo el historial (ventas, visitas, despachos) queda guardado y se exporta a CSV o respaldo JSON en la pestaña **Datos**. |
+| **Sin visibilidad del stock por tienda** | El **Panel** estima el stock por tienda en tiempo real (último conteo + despachos − ventas) y lo valora en RD$. |
+
+## Cómo usarlo
+
+Es una aplicación web sin servidor: **abrir `index.html` en cualquier navegador** (computadora
+o teléfono). También puede publicarse tal cual en GitHub Pages para que los choferes la abran
+desde un enlace.
+
+Flujo diario:
+
+1. **Configuración** (solo la primera vez): cargar los productos reales con precio y nivel par,
+   las 28 tiendas con su ruta/chofer, y los choferes. El sistema viene con datos de **ejemplo**
+   ilustrativos — reemplazarlos antes de operar.
+2. **Despacho → Cargar ventas del día**: pegar el reporte desde Excel (matriz tiendas ×
+   productos), subir un CSV (hay un ejemplo en `ejemplos/ventas-ejemplo.csv`) o digitar manualmente.
+3. **Despacho → Calcular**: revisar/ajustar las cantidades sugeridas y confirmar. Se imprimen las
+   hojas de reparto por chofer y la hoja de producción para cocina.
+4. **Visita de tienda** (el chofer, en su teléfono): elegir su ruta, iniciar la visita, contar los
+   13 productos y cerrar. El Panel se actualiza al momento.
+
+### Lógica de cálculo del despacho
+
+- Si la tienda tiene conteo de chofer y el producto tiene nivel par: se repone hasta el **nivel
+  par** (`sugerido = par − stock estimado`).
+- Si no hay conteo: se **repone lo vendido**, el mismo criterio del Excel actual.
+- Toda cantidad es editable antes de confirmar.
+
+## Alcance del piloto y siguiente fase
+
+- **Persistencia:** los datos se guardan en el dispositivo (localStorage), con respaldo/restauración
+  JSON desde la pestaña Datos. Toda la lectura/escritura pasa por `js/store.js`, de modo que
+  conectar una base compartida (Google Sheets/Airtable vía n8n, o el Odoo del cliente) solo
+  requiere sustituir esa capa — es el puente Odoo↔sistema acordado en la llamada.
+- **Importación de ventas:** acepta matriz (tiendas × productos) y formato largo
+  (`tienda,producto,cantidad`), con nombres tolerantes a acentos y coincidencias parciales.
+  El alcance final del Componente A se valida cuando se reciba un **reporte de ventas real de
+  muestra** (próximo paso 2 del informe).
+- Los datos de ejemplo (productos, precios, tiendas, rutas) son ilustrativos y editables.
+
+## Estructura del código
+
+```
+index.html          Punto de entrada (sin build, sin dependencias)
+css/styles.css      Estilos (móvil primero) + hojas de impresión
+js/util.js          Utilidades (fechas, moneda, CSV, normalización de nombres)
+js/seed.js          Datos de ejemplo (18 productos, 28 tiendas, 4 rutas)
+js/store.js         Capa de datos y cálculos (stock estimado, despacho sugerido)
+js/despacho.js      Componente A — importación de ventas y motor de despacho
+js/visitas.js       Componente B — visita de chofer con conteo obligatorio
+js/panel.js         Panel de visibilidad (stock y valor RD$ por tienda)
+js/config.js        Catálogos: productos, tiendas/rutas, choferes, niveles par
+js/datos.js         Respaldos JSON y exportación CSV
+ejemplos/           Reporte de ventas de ejemplo para probar la importación
+```
