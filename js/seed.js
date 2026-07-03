@@ -80,4 +80,65 @@ const Seed = {
       secuencias: { visita: 1, despacho: 1 },
     };
   },
+
+  /**
+   * Datos de demostracion: catalogos de ejemplo + un dia de operacion completo
+   * (ventas de ayer, despacho entregado hoy, visitas de chofer y ventas de hoy),
+   * para que el equipo vea la herramienta funcionando con un solo clic.
+   * Las cantidades son deterministas (dependen de los ids) para que la demo
+   * sea coherente: stock = conteo + despacho de hoy.
+   */
+  demo() {
+    const datos = this.crear();
+    const hoy = Util.hoyISO();
+    const ayer = Util.sumarDias(hoy, -1);
+    const cant = (t, p, base) => Math.max(0, ((t.id * 3 + p.id * 5 + base) % 6) - 1); // 0..4
+
+    // Ventas de AYER en todas las tiendas
+    for (const t of datos.tiendas) {
+      for (const p of datos.productos) {
+        const c = cant(t, p, 1);
+        if (c > 0) datos.ventas.push({ fecha: ayer, tiendaId: t.id, productoId: p.id, cantidad: c });
+      }
+    }
+
+    // Despacho ENTREGADO HOY, calculado de las ventas de ayer (reponer lo vendido)
+    const lineas = datos.ventas
+      .filter((v) => v.fecha === ayer)
+      .map((v) => ({ tiendaId: v.tiendaId, productoId: v.productoId, cantidad: v.cantidad }));
+    datos.despachos.push({
+      id: datos.secuencias.despacho++,
+      fechaVenta: ayer,
+      fechaDespacho: hoy,
+      generadoEl: `${ayer} 18:30`,
+      lineas,
+    });
+
+    // Visitas de chofer cerradas HOY en las rutas 1 y 2 (las demas quedan pendientes,
+    // para que se vea la diferencia en el Panel)
+    const conteo = datos.productos.filter((p) => p.conteoChofer);
+    for (const t of datos.tiendas.filter((x) => x.choferId <= 2)) {
+      const visita = {
+        id: datos.secuencias.visita++,
+        fecha: hoy,
+        hora: `0${7 + (t.id % 3)}:${String(10 + t.id).slice(-2)}`,
+        tiendaId: t.id,
+        choferId: t.choferId,
+        conteos: {},
+        notas: '',
+        cerrada: true,
+      };
+      for (const p of conteo) visita.conteos[p.id] = cant(t, p, 3);
+      datos.visitas.push(visita);
+    }
+
+    // Ventas de HOY reportadas por las tiendas de las rutas 1 y 2
+    for (const t of datos.tiendas.filter((x) => x.choferId <= 2)) {
+      for (const p of datos.productos) {
+        const c = cant(t, p, 2);
+        if (c > 0) datos.ventas.push({ fecha: hoy, tiendaId: t.id, productoId: p.id, cantidad: c });
+      }
+    }
+    return datos;
+  },
 };

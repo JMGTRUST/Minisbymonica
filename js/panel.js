@@ -10,6 +10,7 @@ const Panel = {
 
   render(cont) {
     if (this.tiendaDetalle) return this.renderDetalle(cont, this.tiendaDetalle);
+    if (Store.sinMovimientos()) return this.renderBienvenida(cont);
 
     const hoy = Util.hoyISO();
     const tiendas = Store.tiendas();
@@ -88,6 +89,37 @@ const Panel = {
         this.render(cont);
       })
     );
+  },
+
+  /** Primera vez (sin movimientos): guia de inicio en lugar de un panel vacio */
+  renderBienvenida(cont) {
+    cont.innerHTML = `
+      <div class="card bienvenida">
+        <h2>👋 ¡Bienvenida! Así funciona el sistema</h2>
+        <ol class="pasos">
+          <li><strong>⚙️ Configuración</strong> — revisa que los productos (con precio y nivel par),
+            las tiendas con su ruta y los choferes sean los tuyos. Vienen unos de ejemplo para empezar.</li>
+          <li><strong>🚚 Despacho</strong> — cada día, pega el reporte de ventas desde Excel (o súbelo en CSV).
+            El sistema calcula cuánto reponer por tienda e imprime las hojas de reparto por chofer
+            y la hoja de producción. Adiós a la hora y media digitando.</li>
+          <li><strong>🏪 Visita de tienda</strong> — el chofer, desde su teléfono, cuenta lo que queda en
+            cada tienda. <strong>No puede cerrar la visita sin contar los 13 productos.</strong></li>
+        </ol>
+        <p>Con eso, este Panel te muestra al momento cuánta mercancía —y cuánto dinero— tienes en cada tienda.</p>
+        <div class="acciones">
+          <button class="btn btn-primario" id="bienv-demo">🎬 Ver una demostración con datos de prueba</button>
+          <button class="btn" id="bienv-config">⚙️ Empezar por la configuración</button>
+        </div>
+        <p class="ayuda">La demostración llena el sistema con un día de operación inventado para que explores
+        sin miedo. Cuando quieras empezar de verdad, ve a <strong>Datos → Reiniciar</strong> y quedará limpio.</p>
+      </div>
+    `;
+    cont.querySelector('#bienv-demo').addEventListener('click', () => {
+      Store.cargarDemo();
+      App.aviso('Datos de demostración cargados 🎬');
+      App.ir('panel');
+    });
+    cont.querySelector('#bienv-config').addEventListener('click', () => App.ir('config'));
   },
 
   renderDetalle(cont, tiendaId) {

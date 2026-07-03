@@ -30,6 +30,12 @@ const Despacho = {
             ${conVentas.size} de ${tiendas.length} tiendas con ventas registradas
           </span>
         </div>
+        ${
+          conVentas.size > 0 && conVentas.size < tiendas.length
+            ? `<details class="detalle-faltantes"><summary>Ver a cuáles tiendas les faltan las ventas (${tiendas.length - conVentas.size})</summary>
+               <p class="ayuda">${tiendas.filter((t) => !conVentas.has(t.id)).map((t) => Util.esc(t.nombre)).join(' · ')}</p></details>`
+            : ''
+        }
         <p class="ayuda">El despacho calculado se entrega el día siguiente
         (<strong>${Util.fechaBonita(Util.sumarDias(fecha, 1))}</strong>).
         ${despachoExistente ? '<span class="pill pill-ok">Ya hay un despacho guardado para esa fecha — puedes regenerarlo.</span>' : ''}</p>
@@ -72,8 +78,16 @@ const Despacho = {
       })
     );
     cont.querySelector('#desp-calcular').addEventListener('click', () => {
+      if (Store.tiendasConVentas(this.fechaVenta).size === 0) {
+        const seguir = confirm(
+          `No hay ventas registradas para el ${Util.fechaBonita(this.fechaVenta)}, así que casi todo saldrá en 0.\n\n` +
+            'Carga primero las ventas en el paso 1 (o presiona Aceptar si de verdad quieres calcular sin ventas).'
+        );
+        if (!seguir) return;
+      }
       this.lineasCalculadas = Store.calcularDespacho(this.fechaVenta);
       this.renderTabla(cont.querySelector('#desp-tabla'));
+      cont.querySelector('#desp-tabla').scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 
     this.renderMetodo(cont.querySelector('#desp-metodo'));
@@ -323,6 +337,8 @@ const Despacho = {
       })
     );
     cont.querySelector('#desp-confirmar').addEventListener('click', () => {
+      const existente = Store.despachoPorFecha(Util.sumarDias(this.fechaVenta, 1));
+      if (existente && !confirm('Ya hay un despacho guardado para esa fecha de entrega. ¿Reemplazarlo con este?')) return;
       const d = Store.guardarDespacho(
         this.fechaVenta,
         this.lineasCalculadas.map((l) => ({ tiendaId: l.tiendaId, productoId: l.productoId, cantidad: l.sugerido }))

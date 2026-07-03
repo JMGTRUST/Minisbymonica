@@ -24,6 +24,11 @@ Es una aplicación web sin servidor: **abrir `index.html` en cualquier navegador
 o teléfono). También puede publicarse tal cual en GitHub Pages para que los choferes la abran
 desde un enlace.
 
+Al abrirlo por primera vez aparece una **guía de bienvenida** con la opción de cargar
+**datos de demostración** (un día de operación inventado) para explorar la herramienta con un
+clic — ideal para la demo de la Sesión 2. La pestaña **❓ Ayuda** explica el día a día en
+lenguaje simple. Cuando se vaya a operar de verdad: **Datos → Reiniciar**.
+
 Flujo diario:
 
 1. **Configuración** (solo la primera vez): cargar los productos reales con precio y nivel par,

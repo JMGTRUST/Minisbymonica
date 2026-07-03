@@ -28,11 +28,13 @@ const Datos = {
         </div>
       </div>
       <div class="card">
-        <h3>Zona de cuidado</h3>
+        <h3>Demostración y reinicio</h3>
         <div class="acciones">
-          <button class="btn btn-peligro" id="dat-reiniciar">Reiniciar con datos de ejemplo</button>
+          <button class="btn" id="dat-demo">🎬 Cargar datos de demostración</button>
+          <button class="btn btn-peligro" id="dat-reiniciar">Reiniciar (dejar todo limpio)</button>
         </div>
-        <p class="ayuda">Borra todo lo registrado y vuelve a los catálogos de ejemplo. Descarga un respaldo antes.</p>
+        <p class="ayuda">La demostración llena el sistema con un día de operación inventado para explorar sin miedo.
+        Reiniciar borra todo lo registrado y deja los catálogos de ejemplo. En ambos casos, descarga un respaldo antes.</p>
       </div>
     `;
 
@@ -99,6 +101,12 @@ const Datos = {
       Util.descargar('despachos.csv', Util.aCSV(filas, ['fecha_despacho', 'tienda', 'producto', 'cantidad']), 'text/csv');
     });
 
+    cont.querySelector('#dat-demo').addEventListener('click', () => {
+      if (!confirm('Esto reemplaza los datos actuales con un día de operación de demostración. ¿Continuar?')) return;
+      Store.cargarDemo();
+      App.aviso('Datos de demostración cargados 🎬');
+      App.ir('panel');
+    });
     cont.querySelector('#dat-reiniciar').addEventListener('click', () => {
       if (!confirm('Esto borra TODOS los datos registrados y vuelve a los datos de ejemplo. ¿Continuar?')) return;
       Store.reiniciarConEjemplo();

@@ -24,7 +24,11 @@ const Visitas = {
   renderListaTiendas(cont) {
     const hoy = Util.hoyISO();
     const choferes = Store.choferes();
-    if (this.choferId == null && choferes.length) this.choferId = choferes[0].id;
+    if (this.choferId == null && choferes.length) {
+      // Recuerda la ruta elegida en este dispositivo (el telefono del chofer)
+      const guardado = Number(localStorage.getItem('minis_chofer'));
+      this.choferId = choferes.some((c) => c.id === guardado) ? guardado : choferes[0].id;
+    }
     const tiendas = Store.tiendasDeChofer(this.choferId);
 
     const filas = tiendas
@@ -68,6 +72,7 @@ const Visitas = {
 
     cont.querySelector('#vis-chofer').addEventListener('change', (e) => {
       this.choferId = Number(e.target.value);
+      localStorage.setItem('minis_chofer', String(this.choferId));
       this.render(cont);
     });
     cont.querySelectorAll('[data-iniciar]').forEach((b) =>
@@ -112,7 +117,9 @@ const Visitas = {
                 const val = visita.conteos[p.id];
                 return `<tr>
                   <td>${Util.esc(p.nombre)}</td>
-                  <td class="num"><input type="number" min="0" inputmode="numeric"
+                  <td class="num celda-conteo">
+                    <button class="btn btn-cero" data-cero="${p.id}" title="No queda ninguno">0</button>
+                    <input type="number" min="0" inputmode="numeric"
                     class="input-num input-grande vis-conteo" data-producto="${p.id}"
                     value="${val === undefined || val === null || val === '' ? '' : val}" placeholder="—"></td>
                 </tr>`;
@@ -141,11 +148,31 @@ const Visitas = {
       this.visitaActivaId = null;
       this.render(cont);
     });
-    cont.querySelectorAll('.vis-conteo').forEach((inp) =>
+    const inputs = [...cont.querySelectorAll('.vis-conteo')];
+    inputs.forEach((inp, i) =>
       inp.addEventListener('input', () => {
         const pid = Number(inp.dataset.producto);
         if (inp.value === '') delete visita.conteos[pid];
         else visita.conteos[pid] = Math.max(0, Number(inp.value));
+        Store.guardar();
+        actualizarProgreso();
+      })
+    );
+    // Enter (o "siguiente" en el teclado del telefono) salta al siguiente producto
+    inputs.forEach((inp, i) =>
+      inp.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          (inputs[i + 1] || cont.querySelector('#vis-cerrar')).focus();
+        }
+      })
+    );
+    // Boton "0" de un toque: lo mas frecuente es que no quede nada en el exhibidor
+    cont.querySelectorAll('[data-cero]').forEach((b) =>
+      b.addEventListener('click', () => {
+        const pid = Number(b.dataset.cero);
+        visita.conteos[pid] = 0;
+        cont.querySelector(`.vis-conteo[data-producto="${pid}"]`).value = '0';
         Store.guardar();
         actualizarProgreso();
       })

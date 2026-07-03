@@ -8,11 +8,15 @@ const App = {
     visitas: { titulo: '🏪 Visita de tienda', modulo: () => Visitas },
     config: { titulo: '⚙️ Configuración', modulo: () => Config },
     datos: { titulo: '💾 Datos', modulo: () => Datos },
+    ayuda: { titulo: '❓ Ayuda', modulo: () => Ayuda },
   },
   actual: 'panel',
 
   init() {
     Store.init();
+    // Vuelve a la pestana donde quedo el usuario (el chofer vive en "visitas")
+    const ultima = localStorage.getItem('minis_tab');
+    if (ultima && this.vistas[ultima]) this.actual = ultima;
     const nav = document.getElementById('nav');
     nav.innerHTML = Object.entries(this.vistas)
       .map(([clave, v]) => `<button class="tab" data-vista="${clave}">${v.titulo}</button>`)
@@ -23,6 +27,7 @@ const App = {
 
   ir(clave) {
     this.actual = clave;
+    localStorage.setItem('minis_tab', clave);
     document.querySelectorAll('#nav .tab').forEach((b) => b.classList.toggle('activo', b.dataset.vista === clave));
     this.vistas[clave].modulo().render(document.getElementById('vista'));
   },

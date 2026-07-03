@@ -37,6 +37,16 @@ const Store = {
     this.guardar();
   },
 
+  cargarDemo() {
+    this.datos = Seed.demo();
+    this.guardar();
+  },
+
+  /** true mientras no se haya registrado ningun movimiento (para mostrar la guia de inicio) */
+  sinMovimientos() {
+    return !this.datos.ventas.length && !this.datos.visitas.length && !this.datos.despachos.length;
+  },
+
   importarJSON(texto) {
     const obj = JSON.parse(texto);
     if (!obj || !Array.isArray(obj.productos) || !Array.isArray(obj.tiendas)) {
