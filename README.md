@@ -73,5 +73,9 @@ js/visitas.js       Componente B — visita de chofer con conteo obligatorio
 js/panel.js         Panel de visibilidad (stock y valor RD$ por tienda)
 js/config.js        Catálogos: productos, tiendas/rutas, choferes, niveles par
 js/datos.js         Respaldos JSON y exportación CSV
+js/ayuda.js         Guía del día a día y preguntas frecuentes
+sw.js               Copia sin conexión (solo activa cuando la app está publicada)
+manifest.webmanifest / icono.svg   Instalable en el teléfono del chofer (PWA)
 ejemplos/           Reporte de ventas de ejemplo para probar la importación
+pruebas/smoke.js    Prueba de humo end-to-end (npm i playwright-core && node pruebas/smoke.js)
 ```

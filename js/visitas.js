@@ -149,7 +149,7 @@ const Visitas = {
       this.render(cont);
     });
     const inputs = [...cont.querySelectorAll('.vis-conteo')];
-    inputs.forEach((inp, i) =>
+    inputs.forEach((inp) =>
       inp.addEventListener('input', () => {
         const pid = Number(inp.dataset.producto);
         if (inp.value === '') delete visita.conteos[pid];

@@ -47,3 +47,9 @@ const App = {
 };
 
 document.addEventListener('DOMContentLoaded', () => App.init());
+
+// Copia sin conexion (solo aplica cuando la app esta publicada en un servidor;
+// abierta como archivo local no hace falta y el navegador no lo permite)
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}

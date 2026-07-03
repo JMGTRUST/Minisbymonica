@@ -27,8 +27,9 @@ const Ayuda = {
         en Configuración). Si no hay conteo, repone lo vendido — igual que el Excel de siempre. Toda cantidad se
         puede corregir a mano antes de confirmar.</p>
         <p><strong>¿Qué pasa si el chofer se queda sin internet?</strong><br>
-        La app funciona sin conexión una vez abierta y guarda todo en el teléfono. Los conteos no se pierden
-        al cerrar o recargar la página.</p>
+        Todo se guarda en el teléfono: los conteos no se pierden al cerrar o recargar la página.
+        Y cuando la app está publicada en internet, el teléfono guarda una copia la primera vez que la abre,
+        así que sigue abriendo aunque no haya señal en el supermercado.</p>
         <p><strong>¿Y si me equivoqué en un conteo o en las ventas?</strong><br>
         Las visitas cerradas se pueden reabrir desde la lista de la ruta (botón <em>Ver → Reabrir</em>), y las
         ventas de una tienda se pueden volver a cargar: lo nuevo reemplaza lo anterior para ese día.</p>

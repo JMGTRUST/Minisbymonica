@@ -1,0 +1,18 @@
+{
+  "name": "Minis by Mónica — Ventas y reparto",
+  "short_name": "Minis Reparto",
+  "description": "Sistema de ventas y reparto en tiempo real: despacho diario e inventario en tienda.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fdf6f0",
+  "theme_color": "#d94f79",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "icono.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

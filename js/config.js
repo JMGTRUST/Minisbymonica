@@ -211,8 +211,18 @@ const Config = {
     cont.querySelectorAll('[data-ccampo]').forEach((inp) =>
       inp.addEventListener('change', () => {
         const c = Store.chofer(Number(inp.dataset.id));
-        if (inp.type === 'checkbox') c.activo = inp.checked;
-        else c.nombre = inp.value;
+        if (inp.type === 'checkbox') {
+          // Un chofer inactivo con tiendas asignadas dejaria esas tiendas fuera
+          // de las hojas de reparto: obligar a reasignarlas primero.
+          if (!inp.checked && Store.tiendasDeChofer(c.id).length) {
+            alert('Este chofer tiene tiendas activas asignadas. Reasígnalas en "Tiendas y rutas" antes de desactivarlo.');
+            inp.checked = true;
+            return;
+          }
+          c.activo = inp.checked;
+        } else {
+          c.nombre = inp.value;
+        }
         Store.guardar();
       })
     );

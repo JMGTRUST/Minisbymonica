@@ -150,6 +150,9 @@ const Store = {
   /* ---------- Visitas (Componente B) ---------- */
 
   crearVisita(tiendaId, choferId, fecha) {
+    // Limpia visitas que quedaron abiertas de dias anteriores para esta tienda
+    // (el chofer empezo y no cerro): no aportan al stock y solo acumulan basura.
+    this.datos.visitas = this.datos.visitas.filter((x) => x.cerrada || x.tiendaId !== tiendaId);
     const v = {
       id: this.datos.secuencias.visita++,
       fecha,
@@ -240,11 +243,13 @@ const Store = {
   /**
    * Estima el stock de un producto en una tienda a una fecha dada.
    *
-   * Modelo: el conteo del chofer es la foto mas confiable. A partir de ahi:
+   * Modelo: el conteo del chofer es la foto mas confiable, y ocurre en la
+   * manana, ANTES de las ventas y de la reposicion de ese dia. A partir de ahi:
    *   stock = conteo
    *         + despachos entregados desde el dia de la visita (inclusive: el
    *           chofer cuenta lo que queda y LUEGO repone)
-   *         - ventas posteriores al dia de la visita.
+   *         - ventas desde el dia de la visita (inclusive: la venta del dia
+   *           ocurre despues del conteo de la manana).
    *
    * Devuelve null si nunca ha habido un conteo cerrado para la tienda.
    */
@@ -260,7 +265,7 @@ const Store = {
       }
     }
     for (const v of this.datos.ventas) {
-      if (v.tiendaId === tiendaId && v.productoId === productoId && v.fecha > visita.fecha && v.fecha <= hastaFecha) {
+      if (v.tiendaId === tiendaId && v.productoId === productoId && v.fecha >= visita.fecha && v.fecha <= hastaFecha) {
         stock -= Number(v.cantidad);
       }
     }
