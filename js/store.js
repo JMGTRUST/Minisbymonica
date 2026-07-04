@@ -47,6 +47,25 @@ const Store = {
     return !this.datos.ventas.length && !this.datos.visitas.length && !this.datos.despachos.length;
   },
 
+  /* ---------- Respaldos ---------- */
+
+  descargarRespaldo() {
+    this.datos.ultimoRespaldo = Util.hoyISO();
+    this.guardar();
+    Util.descargar(`minis-respaldo-${Util.hoyISO()}.json`, JSON.stringify(this.datos, null, 2), 'application/json');
+  },
+
+  /**
+   * Dias desde el ultimo respaldo, o null si no aplica recordatorio.
+   * El navegador puede borrar los datos locales (limpieza de datos, telefonos
+   * con poco espacio), asi que con movimientos registrados hay que respaldar.
+   */
+  diasSinRespaldo() {
+    if (this.sinMovimientos()) return null;
+    if (!this.datos.ultimoRespaldo) return Infinity;
+    return Util.diasEntre(this.datos.ultimoRespaldo, Util.hoyISO());
+  },
+
   importarJSON(texto) {
     const obj = JSON.parse(texto);
     if (!obj || !Array.isArray(obj.productos) || !Array.isArray(obj.tiendas)) {

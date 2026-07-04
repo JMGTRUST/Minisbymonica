@@ -41,8 +41,8 @@ const Ayuda = {
         operación inventado, y <em>Reiniciar</em> para dejar todo limpio cuando vayas a empezar de verdad.</p>
       </div>
       <div class="card">
-        <p class="ayuda">Piloto desarrollado por The Trust for the Americas a partir del diagnóstico del 2 de julio
-        de 2026. Dudas o mejoras: escríbenos en el grupo de WhatsApp del proyecto.</p>
+        <p class="ayuda">Piloto desarrollado por The Trust for the Americas.
+        Dudas o mejoras: escríbenos en el grupo de WhatsApp del proyecto.</p>
       </div>
     `;
   },

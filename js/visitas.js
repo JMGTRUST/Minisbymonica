@@ -3,7 +3,7 @@
  *
  * Regla central pedida por la clienta: la visita NO se puede cerrar hasta que
  * los 13 productos de conteo tengan un valor registrado (el 0 cuenta, pero hay
- * que digitarlo — nada de "no lo vio, no pasó"). Reemplaza las fotos en grupos
+ * que digitarlo — ningun producto puede quedar sin revisar). Reemplaza las fotos en grupos
  * de WhatsApp que se borran: cada visita queda guardada con fecha y hora.
  */
 'use strict';

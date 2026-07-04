@@ -1,20 +1,16 @@
 # Minis by Mónica — Sistema de ventas y reparto en tiempo real
 
-Piloto desarrollado por **The Trust for the Americas** a partir del diagnóstico realizado con
-Mónica Quiñones (2 de julio de 2026). Es la solución que la empresa priorizó: sustituir la
-digitación manual del Excel de despacho y las fotos de inventario en WhatsApp por un solo
-sistema con visibilidad en tiempo real.
-
-> *"Cada mercancía que ellos dejan allá, consignación, ellos la ven como mercancía,
-> pero yo la veo traducida en dinero."* — El panel muestra exactamente eso: cuánto
-> dinero hay en cada tienda.
+Piloto desarrollado por **The Trust for the Americas** dentro de su programa de consultoría de
+IA para PyMEs. Es la solución que la empresa priorizó: sustituir la digitación manual del Excel
+de despacho y las fotos de inventario en WhatsApp por un solo sistema con visibilidad en tiempo
+real del inventario en consignación — y de su valor en dinero.
 
 ## Qué resuelve
 
-| Dolor del diagnóstico | Cómo lo resuelve la herramienta |
+| Situación de partida | Cómo lo resuelve la herramienta |
 | --- | --- |
 | **Despacho diario manual** (~1 h 30 min digitando ventas de 18 productos en 28 tiendas) | **Componente A — Motor de despacho:** el reporte de ventas se pega desde Excel o se sube como CSV; el sistema lo lee, calcula cuánto reponer por tienda y genera la relación de despacho por chofer y la hoja de producción, listas para imprimir. |
-| **Inventario en tienda incompleto** ("hacen el inventario de 7, pero los otros no...") | **Componente B — Visita de chofer:** formulario móvil que **no permite cerrar la visita hasta contar los 13 productos** (el 0 hay que digitarlo). Cada visita queda registrada con fecha y hora. |
+| **Inventario en tienda incompleto** (se contaba solo una parte de los productos) | **Componente B — Visita de chofer:** formulario móvil que **no permite cerrar la visita hasta contar los 13 productos** (el 0 hay que digitarlo). Cada visita queda registrada con fecha y hora. |
 | **Fotos en grupos de WhatsApp que se borran** | Todo el historial (ventas, visitas, despachos) queda guardado y se exporta a CSV o respaldo JSON en la pestaña **Datos**. |
 | **Sin visibilidad del stock por tienda** | El **Panel** estima el stock por tienda en tiempo real (último conteo + despachos − ventas) y lo valora en RD$. |
 

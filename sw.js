@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const CACHE = 'minis-reparto-v1';
+const CACHE = 'minis-reparto-v1.2';
 const ARCHIVOS = [
   './',
   './index.html',

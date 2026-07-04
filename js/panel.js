@@ -1,6 +1,6 @@
 /*
  * Panel — visibilidad en tiempo real.
- * "Cada mercancía que ellos dejan allá... yo la veo traducida en dinero":
+ * La mercancía en consignación es dinero de la empresa parado en las tiendas:
  * el panel muestra el stock estimado por tienda y su valor en RD$.
  */
 'use strict';
@@ -36,12 +36,24 @@ const Panel = {
       return { t, stock, estado };
     });
 
+    const diasSinRespaldo = Store.diasSinRespaldo();
+    const avisoRespaldo =
+      diasSinRespaldo != null && diasSinRespaldo >= 7
+        ? `<div class="card banner-respaldo">💾 ${
+            diasSinRespaldo === Infinity
+              ? 'Aún no has descargado ningún respaldo'
+              : `Hace ${diasSinRespaldo} días que no descargas un respaldo`
+          } y los datos viven solo en este dispositivo.
+          <button class="btn btn-mini" id="pan-respaldo">Descargar respaldo ahora</button></div>`
+        : '';
+
     const visitadasHoy = tiendas.filter((t) => Store.visitaCerrada(t.id, hoy)).length;
     const ventasHoy = Store.datos.ventas.filter((v) => v.fecha === hoy);
     const unidadesVendidas = ventasHoy.reduce((s, v) => s + v.cantidad, 0);
     const valorVendido = ventasHoy.reduce((s, v) => s + v.cantidad * Number((Store.producto(v.productoId) || {}).precio || 0), 0);
 
     cont.innerHTML = `
+      ${avisoRespaldo}
       <div class="kpis">
         <div class="kpi">
           <div class="kpi-valor">${Util.moneda(valorTotal)}</div>
@@ -89,6 +101,13 @@ const Panel = {
         this.render(cont);
       })
     );
+    const btnRespaldo = cont.querySelector('#pan-respaldo');
+    if (btnRespaldo)
+      btnRespaldo.addEventListener('click', () => {
+        Store.descargarRespaldo();
+        App.aviso('Respaldo descargado ✔ Guárdalo en el Drive');
+        this.render(cont);
+      });
   },
 
   /** Primera vez (sin movimientos): guia de inicio en lugar de un panel vacio */

@@ -78,6 +78,9 @@ const Seed = {
       // Despachos generados (Componente A): {id, fechaVenta, fechaDespacho, generadoEl, lineas, estado}
       despachos: [],
       secuencias: { visita: 1, despacho: 1 },
+      // Fecha del ultimo respaldo descargado; con movimientos y sin respaldo
+      // reciente, el Panel lo recuerda.
+      ultimoRespaldo: null,
     };
   },
 
@@ -139,6 +142,8 @@ const Seed = {
         if (c > 0) datos.ventas.push({ fecha: hoy, tiendaId: t.id, productoId: p.id, cantidad: c });
       }
     }
+    // En modo demostracion no tiene sentido pedir respaldos
+    datos.ultimoRespaldo = hoy;
     return datos;
   },
 };

@@ -12,7 +12,8 @@ const Datos = {
       <div class="card">
         <h3>Respaldo</h3>
         <p class="ayuda">Los datos viven en este dispositivo (piloto sin servidor). Descarga un respaldo
-        con frecuencia y guárdalo en el Drive; se puede restaurar en cualquier otro dispositivo.</p>
+        con frecuencia y guárdalo en el Drive; se puede restaurar en cualquier otro dispositivo.
+        Último respaldo: <strong>${d.ultimoRespaldo ? Util.fechaBonita(d.ultimoRespaldo) : 'nunca'}</strong>.</p>
         <div class="acciones">
           <button class="btn btn-primario" id="dat-exportar">⬇️ Descargar respaldo (JSON)</button>
           <label class="btn">⬆️ Restaurar respaldo <input type="file" id="dat-importar" accept=".json" hidden></label>
@@ -39,7 +40,8 @@ const Datos = {
     `;
 
     cont.querySelector('#dat-exportar').addEventListener('click', () => {
-      Util.descargar(`minis-respaldo-${Util.hoyISO()}.json`, JSON.stringify(Store.datos, null, 2), 'application/json');
+      Store.descargarRespaldo();
+      this.render(cont);
     });
     cont.querySelector('#dat-importar').addEventListener('change', (e) => {
       const archivo = e.target.files[0];
