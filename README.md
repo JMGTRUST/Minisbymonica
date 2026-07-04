@@ -51,6 +51,7 @@ El repositorio incluye [`render.yaml`](render.yaml). En Render:
 
 1. Crea un **Blueprint** desde este repositorio.
 2. Render detectará el Web Service `minis-by-monica`.
+   El Blueprint fija explícitamente el plan **Free ($0)**.
 3. Introduce los cuatro valores marcados como secretos:
    `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `CHOFER_EMAIL` y `CHOFER_PASSWORD`.
 4. `SESSION_SECRET` se genera automáticamente.
