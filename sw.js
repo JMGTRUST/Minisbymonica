@@ -1,11 +1,10 @@
 /*
  * Service worker: deja la app usable sin conexion cuando esta publicada en
- * internet (los choferes en supermercados con mala senal). Estrategia:
- * red primero y, si falla, la copia guardada.
+ * internet (los choferes en supermercados con mala senal).
  */
 'use strict';
 
-const CACHE = 'minis-reparto-v1.2';
+const CACHE = 'minis-reparto-v1.3';
 const ARCHIVOS = [
   './',
   './index.html',
@@ -21,6 +20,7 @@ const ARCHIVOS = [
   './js/datos.js',
   './js/ayuda.js',
   './js/app.js',
+  './icono.svg',
 ];
 
 self.addEventListener('install', (e) => {
@@ -36,14 +36,30 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
+  if (e.request.method !== 'GET' || new URL(e.request.url).origin !== self.location.origin) return;
+
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request)
+        .then((resp) => (resp.ok ? resp : Promise.reject(new Error(`HTTP ${resp.status}`))))
+        .catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+
+  // Los recursos versionados de la app salen de caché al instante. Una nueva
+  // versión de CACHE los renueva al instalarse. Nunca devolvemos HTML para JS/CSS.
   e.respondWith(
-    fetch(e.request)
-      .then((resp) => {
-        const copia = resp.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, copia));
-        return resp;
-      })
-      .catch(() => caches.match(e.request, { ignoreSearch: true }).then((r) => r || caches.match('./index.html')))
+    caches.match(e.request, { ignoreSearch: true }).then(
+      (guardado) =>
+        guardado ||
+        fetch(e.request).then((resp) => {
+          if (resp.ok) {
+            const copia = resp.clone();
+            e.waitUntil(caches.open(CACHE).then((c) => c.put(e.request, copia)));
+          }
+          return resp;
+        })
+    )
   );
 });

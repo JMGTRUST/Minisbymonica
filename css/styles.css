@@ -62,6 +62,8 @@ main { max-width: 1100px; margin: 0 auto; padding: 16px; }
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
+  max-width: 100%;
+  overflow-x: auto;
 }
 .card h3 { margin-top: 0; }
 
@@ -169,6 +171,8 @@ input[type="checkbox"] { width: 18px; height: 18px; }
 
 /* Guia de bienvenida y ayuda */
 .bienvenida h2 { color: var(--rosa-oscuro); margin-top: 0; }
+.bienvenida .acciones { display: flex; flex-wrap: wrap; white-space: normal; }
+.bienvenida .acciones .btn { flex: 1 1 240px; white-space: normal; }
 .pasos { padding-left: 20px; }
 .pasos li { margin-bottom: 12px; line-height: 1.5; }
 .detalle-faltantes { margin-top: 8px; }
@@ -223,4 +227,5 @@ input[type="checkbox"] { width: 18px; height: 18px; }
   main { padding: 10px; }
   .tabla th, .tabla td { padding: 7px 4px; }
   .kpi-valor { font-size: 18px; }
+  .bienvenida .acciones .btn { width: 100%; margin-right: 0; }
 }

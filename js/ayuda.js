@@ -27,7 +27,8 @@ const Ayuda = {
         en Configuración). Si no hay conteo, repone lo vendido — igual que el Excel de siempre. Toda cantidad se
         puede corregir a mano antes de confirmar.</p>
         <p><strong>¿Qué pasa si el chofer se queda sin internet?</strong><br>
-        Todo se guarda en el teléfono: los conteos no se pierden al cerrar o recargar la página.
+        Todo se guarda en ese teléfono: los conteos no se pierden al cerrar o recargar la página,
+        pero no se sincronizan automáticamente con otros dispositivos.
         Y cuando la app está publicada en internet, el teléfono guarda una copia la primera vez que la abre,
         así que sigue abriendo aunque no haya señal en el supermercado.</p>
         <p><strong>¿Y si me equivoqué en un conteo o en las ventas?</strong><br>

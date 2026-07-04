@@ -16,9 +16,13 @@ const Store = {
     const crudo = localStorage.getItem(this.CLAVE);
     if (crudo) {
       try {
-        this.datos = JSON.parse(crudo);
+        this.datos = this.migrarYValidar(JSON.parse(crudo));
       } catch (e) {
-        console.error('Datos corruptos en localStorage, se reinicia con datos de ejemplo', e);
+        // Conserva una copia recuperable antes de iniciar limpio.
+        try {
+          localStorage.setItem(`${this.CLAVE}_corrupto_${Date.now()}`, crudo);
+        } catch (_) {}
+        console.error('Datos corruptos en localStorage; se guardó una copia de recuperación y se inició limpio', e);
         this.datos = null;
       }
     }
@@ -29,7 +33,34 @@ const Store = {
   },
 
   guardar() {
-    localStorage.setItem(this.CLAVE, JSON.stringify(this.datos));
+    try {
+      localStorage.setItem(this.CLAVE, JSON.stringify(this.datos));
+    } catch (e) {
+      throw new Error('No se pudieron guardar los datos en este dispositivo. Descarga un respaldo y libera espacio.');
+    }
+  },
+
+  migrarYValidar(obj) {
+    const requeridos = ['productos', 'tiendas', 'choferes', 'ventas', 'visitas', 'despachos'];
+    if (!obj || requeridos.some((campo) => !Array.isArray(obj[campo]))) {
+      throw new Error('El archivo no tiene el formato de respaldo esperado.');
+    }
+    if (!obj.secuencias || !Number.isFinite(Number(obj.secuencias.visita)) || !Number.isFinite(Number(obj.secuencias.despacho))) {
+      throw new Error('El respaldo no contiene secuencias válidas.');
+    }
+    if (!Array.isArray(obj.reportesVentas)) {
+      // Los respaldos v1 solo permiten inferir reportes con alguna venta positiva.
+      const vistos = new Set();
+      obj.reportesVentas = [];
+      for (const v of obj.ventas) {
+        const clave = `${v.fecha}|${v.tiendaId}`;
+        if (vistos.has(clave)) continue;
+        vistos.add(clave);
+        obj.reportesVentas.push({ fecha: v.fecha, tiendaId: v.tiendaId });
+      }
+    }
+    obj.version = 2;
+    return obj;
   },
 
   reiniciarConEjemplo() {
@@ -67,11 +98,7 @@ const Store = {
   },
 
   importarJSON(texto) {
-    const obj = JSON.parse(texto);
-    if (!obj || !Array.isArray(obj.productos) || !Array.isArray(obj.tiendas)) {
-      throw new Error('El archivo no tiene el formato de respaldo esperado.');
-    }
-    this.datos = obj;
+    this.datos = this.migrarYValidar(JSON.parse(texto));
     this.guardar();
   },
 
@@ -122,35 +149,44 @@ const Store = {
   buscarProducto(texto) {
     const n = Util.normalizar(texto);
     if (!n) return null;
-    return (
-      this.productos(false).find((p) => Util.normalizar(p.codigo) === n) ||
-      this.productos(false).find((p) => Util.normalizar(p.nombre) === n) ||
-      this.productos(false).find((p) => Util.normalizar(p.nombre).includes(n) || n.includes(Util.normalizar(p.nombre))) ||
-      null
-    );
+    const productos = this.productos(false);
+    const exacto =
+      productos.find((p) => Util.normalizar(p.codigo) === n) ||
+      productos.find((p) => Util.normalizar(p.nombre) === n);
+    if (exacto) return exacto;
+    const parciales = productos.filter((p) => Util.normalizar(p.nombre).includes(n) || n.includes(Util.normalizar(p.nombre)));
+    return parciales.length === 1 ? parciales[0] : null;
   },
 
   buscarTienda(texto) {
     const n = Util.normalizar(texto);
     if (!n) return null;
-    return (
-      this.tiendas(false).find((t) => Util.normalizar(t.nombre) === n) ||
-      this.tiendas(false).find((t) => Util.normalizar(t.nombre).includes(n) || n.includes(Util.normalizar(t.nombre))) ||
-      null
-    );
+    const tiendas = this.tiendas(false);
+    const exacta = tiendas.find((t) => Util.normalizar(t.nombre) === n);
+    if (exacta) return exacta;
+    const parciales = tiendas.filter((t) => Util.normalizar(t.nombre).includes(n) || n.includes(Util.normalizar(t.nombre)));
+    return parciales.length === 1 ? parciales[0] : null;
   },
 
   /* ---------- Ventas ---------- */
 
-  /** Reemplaza las ventas de una tienda para una fecha */
+  /**
+   * Actualiza únicamente los productos incluidos en `cantidades`.
+   * Un valor 0 elimina la venta de ese producto sin borrar los demás.
+   */
   registrarVentasTienda(fecha, tiendaId, cantidades /* {productoId: cantidad} */) {
-    this.datos.ventas = this.datos.ventas.filter((v) => !(v.fecha === fecha && v.tiendaId === tiendaId));
+    const productosIncluidos = new Set(Object.keys(cantidades).map(Number));
+    this.datos.ventas = this.datos.ventas.filter(
+      (v) => !(v.fecha === fecha && v.tiendaId === tiendaId && productosIncluidos.has(v.productoId))
+    );
     for (const [productoId, cantidad] of Object.entries(cantidades)) {
       const c = Number(cantidad);
       if (Number.isFinite(c) && c > 0) {
         this.datos.ventas.push({ fecha, tiendaId, productoId: Number(productoId), cantidad: c });
       }
     }
+    const yaRegistrado = this.datos.reportesVentas.some((r) => r.fecha === fecha && r.tiendaId === tiendaId);
+    if (!yaRegistrado) this.datos.reportesVentas.push({ fecha, tiendaId });
     this.guardar();
   },
 
@@ -163,7 +199,7 @@ const Store = {
   },
 
   tiendasConVentas(fecha) {
-    return new Set(this.datos.ventas.filter((v) => v.fecha === fecha).map((v) => v.tiendaId));
+    return new Set(this.datos.reportesVentas.filter((r) => r.fecha === fecha).map((r) => r.tiendaId));
   },
 
   /* ---------- Visitas (Componente B) ---------- */
@@ -257,7 +293,7 @@ const Store = {
     return [...this.datos.despachos].sort((a, b) => (a.fechaDespacho < b.fechaDespacho ? 1 : -1));
   },
 
-  /* ---------- Stock estimado (corazon de la visibilidad en tiempo real) ---------- */
+  /* ---------- Stock estimado (corazon de la visibilidad local) ---------- */
 
   /**
    * Estima el stock de un producto en una tienda a una fecha dada.

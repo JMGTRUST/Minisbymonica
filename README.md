@@ -1,9 +1,9 @@
-# Minis by Mónica — Sistema de ventas y reparto en tiempo real
+# Minis by Mónica — Piloto local de ventas y reparto
 
 Piloto desarrollado por **The Trust for the Americas** dentro de su programa de consultoría de
 IA para PyMEs. Es la solución que la empresa priorizó: sustituir la digitación manual del Excel
 de despacho y las fotos de inventario en WhatsApp por un solo sistema con visibilidad en tiempo
-real del inventario en consignación — y de su valor en dinero.
+actualizada del inventario en consignación — y de su valor en dinero— dentro de un mismo dispositivo.
 
 ## Qué resuelve
 
@@ -12,7 +12,7 @@ real del inventario en consignación — y de su valor en dinero.
 | **Despacho diario manual** (~1 h 30 min digitando ventas de 18 productos en 28 tiendas) | **Componente A — Motor de despacho:** el reporte de ventas se pega desde Excel o se sube como CSV; el sistema lo lee, calcula cuánto reponer por tienda y genera la relación de despacho por chofer y la hoja de producción, listas para imprimir. |
 | **Inventario en tienda incompleto** (se contaba solo una parte de los productos) | **Componente B — Visita de chofer:** formulario móvil que **no permite cerrar la visita hasta contar los 13 productos** (el 0 hay que digitarlo). Cada visita queda registrada con fecha y hora. |
 | **Fotos en grupos de WhatsApp que se borran** | Todo el historial (ventas, visitas, despachos) queda guardado y se exporta a CSV o respaldo JSON en la pestaña **Datos**. |
-| **Sin visibilidad del stock por tienda** | El **Panel** estima el stock por tienda en tiempo real (último conteo + despachos − ventas) y lo valora en RD$. |
+| **Sin visibilidad del stock por tienda** | El **Panel** estima el stock por tienda (último conteo + despachos − ventas) y lo valora en RD$. |
 
 ## Cómo usarlo
 
@@ -34,8 +34,8 @@ Flujo diario:
    productos), subir un CSV (hay un ejemplo en `ejemplos/ventas-ejemplo.csv`) o digitar manualmente.
 3. **Despacho → Calcular**: revisar/ajustar las cantidades sugeridas y confirmar. Se imprimen las
    hojas de reparto por chofer y la hoja de producción para cocina.
-4. **Visita de tienda** (el chofer, en su teléfono): elegir su ruta, iniciar la visita, contar los
-   13 productos y cerrar. El Panel se actualiza al momento.
+4. **Visita de tienda**: elegir la ruta, iniciar la visita, contar los 13 productos y cerrar.
+   El Panel del mismo dispositivo se actualiza al momento.
 
 ### Lógica de cálculo del despacho
 
@@ -47,9 +47,10 @@ Flujo diario:
 ## Alcance del piloto y siguiente fase
 
 - **Persistencia:** los datos se guardan en el dispositivo (localStorage), con respaldo/restauración
-  JSON desde la pestaña Datos. Toda la lectura/escritura pasa por `js/store.js`, de modo que
-  conectar una base compartida (Google Sheets/Airtable vía n8n, o el Odoo del cliente) solo
-  requiere sustituir esa capa — es el puente Odoo↔sistema acordado en la llamada.
+  JSON desde la pestaña Datos. **Los dispositivos no se sincronizan entre sí:** una visita hecha
+  en un teléfono no aparece automáticamente en otra computadora. Para operación multiusuario se
+  necesita una siguiente fase con API/base compartida, autenticación, cola sin conexión y manejo
+  de conflictos. `js/store.js` concentra el modelo local y es el punto de partida de esa migración.
 - **Importación de ventas:** acepta matriz (tiendas × productos) y formato largo
   (`tienda,producto,cantidad`), con nombres tolerantes a acentos y coincidencias parciales.
   El alcance final del Componente A se valida cuando se reciba un **reporte de ventas real de
@@ -73,5 +74,17 @@ js/ayuda.js         Guía del día a día y preguntas frecuentes
 sw.js               Copia sin conexión (solo activa cuando la app está publicada)
 manifest.webmanifest / icono.svg   Instalable en el teléfono del chofer (PWA)
 ejemplos/           Reporte de ventas de ejemplo para probar la importación
-pruebas/smoke.js    Prueba de humo end-to-end (npm i playwright-core && node pruebas/smoke.js)
+pruebas/smoke.js    Prueba de humo end-to-end (`npm ci && npm test`)
 ```
+
+## Desarrollo y pruebas
+
+Requiere Node.js 20 o posterior:
+
+```bash
+npm ci
+npx playwright install chromium
+npm test
+```
+
+La publicación en GitHub Pages ejecuta la prueba completa antes de desplegar.

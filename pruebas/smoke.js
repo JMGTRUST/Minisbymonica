@@ -1,10 +1,10 @@
 /*
  * Prueba de humo end-to-end de la app estatica.
- * Uso:  npm i playwright-core  y luego  node pruebas/smoke.js
+ * Uso: npm ci && npx playwright install chromium && npm test
  * Si Chromium no esta donde Playwright lo busca por defecto, apuntar CHROME_BIN
  * al ejecutable (p. ej. CHROME_BIN=/usr/bin/chromium node pruebas/smoke.js).
  */
-const { chromium } = require('playwright-core');
+const { chromium } = require('playwright');
 const path = require('path');
 
 (async () => {
@@ -80,6 +80,32 @@ const path = require('path');
   assert(res.includes('2') && res.includes('tiendas'), 'Importación registró 2 tiendas: ' + res.split('\n')[0]);
   assert(res.includes('Tienda Fantasma'), 'Tienda no reconocida se reporta como error');
 
+  // Una segunda importación parcial actualiza solo el producto incluido.
+  const ventasAntes = await page.evaluate(() => Store.ventasDe(Util.hoyISO(), 1));
+  await page.fill('#desp-pegar', [
+    'Tienda\tDulce de leche en corte',
+    'Bravo Núñez de Cáceres\t2',
+  ].join('\n'));
+  await page.click('#desp-btn-pegar');
+  const ventasDespues = await page.evaluate(() => Store.ventasDe(Util.hoyISO(), 1));
+  assert(ventasDespues[1] === 2, 'Reimportación parcial actualiza el producto incluido');
+  assert(ventasDespues[12] === ventasAntes[12], 'Reimportación parcial conserva los demás productos');
+
+  // CSV real: comillas, coma dentro de una celda y comillas escapadas.
+  const csv = 'tienda,producto,cantidad\n"Bravo Núñez de Cáceres","Producto, no existente",1\n' +
+    '"Jumbo San Isidro","Palitos de coco",0\n';
+  await page.evaluate((texto) => {
+    Despacho.procesarTexto(texto, ',');
+  }, csv);
+  res = await page.locator('#desp-import-resultado').innerText();
+  assert(res.includes('Producto, no existente'), 'CSV conserva comas dentro de campos entre comillas');
+
+  // Una tienda con cero ventas queda registrada como reportada.
+  const reportadaCero = await page.evaluate(() => Store.tiendasConVentas(Util.hoyISO()).has(28));
+  assert(!reportadaCero, 'Tienda sin reporte sigue pendiente');
+  await page.evaluate(() => Store.registrarVentasTienda(Util.hoyISO(), 28, { 1: 0, 2: 0 }));
+  assert(await page.evaluate(() => Store.tiendasConVentas(Util.hoyISO()).has(28)), 'Reporte con cero ventas cuenta como recibido');
+
   // Calcular y confirmar despacho
   await page.click('#desp-calcular');
   assert(await page.locator('.desp-cant').count() > 0, 'Tabla de despacho generada');
@@ -116,6 +142,26 @@ const path = require('path');
   assert((await page.locator('#conf-cuerpo tbody tr').count()) === 18, 'Configuración lista 18 productos');
   await page.click('[data-vista="datos"]');
   assert((await page.locator('#dat-exportar').count()) === 1, 'Pestaña Datos carga');
+
+  // Compatibilidad: un respaldo/localStorage v1 migra sin perder ventas.
+  await page.evaluate(() => {
+    const anterior = Seed.crear();
+    anterior.version = 1;
+    delete anterior.reportesVentas;
+    anterior.ventas.push({ fecha: Util.hoyISO(), tiendaId: 3, productoId: 1, cantidad: 4 });
+    localStorage.setItem(Store.CLAVE, JSON.stringify(anterior));
+  });
+  await page.reload();
+  assert(await page.evaluate(() => Store.datos.version === 2), 'Datos v1 migran al esquema v2');
+  assert(await page.evaluate(() => Store.tiendasConVentas(Util.hoyISO()).has(3)), 'Migración conserva el estado de ventas reportadas');
+
+  // Regresión visual móvil: las tablas anchas deben desplazarse dentro de la tarjeta.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.click('[data-vista="panel"]');
+  assert(
+    await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    'El panel cabe en una pantalla móvil sin desbordamiento horizontal'
+  );
 
   const erroresReales = errores.filter((e) => !e.includes('favicon'));
   if (erroresReales.length) throw new Error('Errores de consola/página:\n' + erroresReales.join('\n'));
