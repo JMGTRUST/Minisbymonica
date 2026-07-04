@@ -44,12 +44,27 @@ Flujo diario:
 - Si no hay conteo: se **repone lo vendido**, el mismo criterio del Excel actual.
 - Toda cantidad es editable antes de confirmar.
 
+## Arquitectura: modo local y modo compartido
+
+```
+Chofer (WhatsApp) ──► n8n + Claude ──► Supabase ◄──► App (panel, despacho, visitas)
+                     agente-choferes/   base común        esta misma página
+```
+
+- **Modo local (por defecto):** sin configurar nada, los datos viven en el dispositivo
+  (localStorage) con respaldo/restauración JSON desde la pestaña Datos.
+- **Modo compartido:** al crear un proyecto gratuito de Supabase, ejecutar
+  `supabase/esquema.sql` y completar `js/supabase-config.js`, todos los dispositivos ven los
+  mismos datos **en tiempo real** (un conteo cerrado en tienda aparece al instante en el panel
+  de la oficina). La app sigue funcionando sin señal y sincroniza al volver la conexión.
+- **Agente de WhatsApp para choferes:** en `agente-choferes/` está el workflow de n8n con
+  Claude que captura las visitas conversando por WhatsApp y escribe a la misma base — misma
+  regla de los 13 productos. Ver su README para montarlo.
+
 ## Alcance del piloto y siguiente fase
 
-- **Persistencia:** los datos se guardan en el dispositivo (localStorage), con respaldo/restauración
-  JSON desde la pestaña Datos. Toda la lectura/escritura pasa por `js/store.js`, de modo que
-  conectar una base compartida (Google Sheets/Airtable vía n8n, o el Odoo del cliente) solo
-  requiere sustituir esa capa — es el puente Odoo↔sistema acordado en la llamada.
+- **Integración con Odoo:** la base compartida es el punto de enchufe natural para el puente
+  Odoo↔sistema acordado en la llamada (n8n lee/escribe ambos lados).
 - **Importación de ventas:** acepta matriz (tiendas × productos) y formato largo
   (`tienda,producto,cantidad`), con nombres tolerantes a acentos y coincidencias parciales.
   El alcance final del Componente A se valida cuando se reciba un **reporte de ventas real de
@@ -70,6 +85,10 @@ js/panel.js         Panel de visibilidad (stock y valor RD$ por tienda)
 js/config.js        Catálogos: productos, tiendas/rutas, choferes, niveles par
 js/datos.js         Respaldos JSON y exportación CSV
 js/ayuda.js         Guía del día a día y preguntas frecuentes
+js/sync.js          Sincronización con la base compartida (Supabase, opcional)
+js/supabase-config.js  Credenciales del proyecto Supabase (vacío = modo local)
+supabase/esquema.sql   Esquema de la base compartida + datos semilla
+agente-choferes/    Agente de WhatsApp para choferes (n8n + Claude)
 sw.js               Copia sin conexión (solo activa cuando la app está publicada)
 manifest.webmanifest / icono.svg   Instalable en el teléfono del chofer (PWA)
 ejemplos/           Reporte de ventas de ejemplo para probar la importación

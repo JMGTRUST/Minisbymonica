@@ -15,7 +15,7 @@
       <span class="logo">🧁</span>
       <div>
         <h1>Minis by Mónica</h1>
-        <p>Sistema de ventas y reparto en tiempo real</p>
+        <p>Sistema de ventas y reparto en tiempo real <span id="estado-sync" class="pill" hidden></span></p>
       </div>
     </div>
     <nav id="nav" class="nav"></nav>
@@ -27,12 +27,14 @@
   <div id="area-impresion" class="solo-imprimir"></div>
 
   <footer class="pie no-imprimir">
-    Piloto — The Trust for the Americas · v1.2 · Los datos se guardan en este dispositivo; descarga respaldos desde la pestaña “Datos”.
+    Piloto — The Trust for the Americas · v1.3 · Sin base compartida configurada, los datos se guardan en este dispositivo; descarga respaldos desde la pestaña “Datos”.
   </footer>
 
+  <script src="js/supabase-config.js"></script>
   <script src="js/util.js"></script>
   <script src="js/seed.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/sync.js"></script>
   <script src="js/panel.js"></script>
   <script src="js/despacho.js"></script>
   <script src="js/visitas.js"></script>

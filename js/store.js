@@ -30,6 +30,22 @@ const Store = {
 
   guardar() {
     localStorage.setItem(this.CLAVE, JSON.stringify(this.datos));
+    // Los catalogos (productos/tiendas/choferes) se editan con guardados
+    // sueltos desde Configuracion; se espejan a la base con debounce.
+    if (typeof Sync !== 'undefined') Sync.pushCatalogos();
+  },
+
+  /** Guardado local sin espejo (lo usa la propia sincronizacion al descargar) */
+  guardarSoloLocal() {
+    localStorage.setItem(this.CLAVE, JSON.stringify(this.datos));
+  },
+
+  /**
+   * Id unico entre dispositivos para visitas/despachos: en modo compartido
+   * varios telefonos crean registros a la vez y una secuencia local chocaria.
+   */
+  nuevoId() {
+    return Date.now() * 1000 + Math.floor(Math.random() * 1000);
   },
 
   reiniciarConEjemplo() {
@@ -151,7 +167,8 @@ const Store = {
         this.datos.ventas.push({ fecha, tiendaId, productoId: Number(productoId), cantidad: c });
       }
     }
-    this.guardar();
+    this.guardarSoloLocal();
+    if (typeof Sync !== 'undefined') Sync.pushVentas(fecha, tiendaId, cantidades);
   },
 
   ventasDe(fecha, tiendaId) {
@@ -173,7 +190,7 @@ const Store = {
     // (el chofer empezo y no cerro): no aportan al stock y solo acumulan basura.
     this.datos.visitas = this.datos.visitas.filter((x) => x.cerrada || x.tiendaId !== tiendaId);
     const v = {
-      id: this.datos.secuencias.visita++,
+      id: this.nuevoId(),
       fecha,
       hora: null,
       tiendaId,
@@ -183,8 +200,14 @@ const Store = {
       cerrada: false,
     };
     this.datos.visitas.push(v);
-    this.guardar();
+    this.guardarVisita(v);
     return v;
+  },
+
+  /** Guarda una visita localmente y la espeja a la base (con debounce) */
+  guardarVisita(v) {
+    this.guardarSoloLocal();
+    if (typeof Sync !== 'undefined') Sync.programarPushVisita(v);
   },
 
   visita(id) {
@@ -217,7 +240,7 @@ const Store = {
     }
     v.cerrada = true;
     v.hora = Util.horaActual();
-    this.guardar();
+    this.guardarVisita(v);
     return { ok: true };
   },
 
@@ -238,14 +261,15 @@ const Store = {
     // Un despacho por fecha de despacho: si se regenera, se reemplaza.
     this.datos.despachos = this.datos.despachos.filter((d) => d.fechaDespacho !== fechaDespacho);
     const d = {
-      id: this.datos.secuencias.despacho++,
+      id: this.nuevoId(),
       fechaVenta,
       fechaDespacho,
       generadoEl: `${Util.hoyISO()} ${Util.horaActual()}`,
       lineas: lineas.filter((l) => Number(l.cantidad) > 0),
     };
     this.datos.despachos.push(d);
-    this.guardar();
+    this.guardarSoloLocal();
+    if (typeof Sync !== 'undefined') Sync.pushDespacho(d);
     return d;
   },
 
