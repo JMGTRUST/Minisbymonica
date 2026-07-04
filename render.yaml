@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: minis-by-monica
+    runtime: node
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_VERSION
+        value: 22.14.0
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: CHOFER_EMAIL
+        sync: false
+      - key: CHOFER_PASSWORD
+        sync: false
+      - key: CHOFER_NAME
+        value: Chofer piloto
