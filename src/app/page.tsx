@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/login-form";
 import { getSession } from "@/lib/session";
@@ -11,8 +12,8 @@ export default async function HomePage() {
       <section className="landing-story">
         <header className="landing-header">
           <div className="brand">
-            <span className="brand-mark" aria-hidden>m</span>
-            <span><strong>Minis by Mónica</strong><small>Operaciones</small></span>
+            <Image className="brand-logo landing-logo" src="/minis-logo.png" alt="Minis by Mónica" width={112} height={72} priority />
+            <span className="brand-context">Operaciones</span>
           </div>
           <span className="secure-pill">Acceso seguro</span>
         </header>

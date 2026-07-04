@@ -24,10 +24,9 @@ a { color: inherit; text-decoration: none; }
 .landing-story::after { content: ""; position: absolute; width: 440px; height: 440px; right: -180px; bottom: -210px; border: 80px solid rgba(217,79,121,.08); border-radius: 50%; }
 .landing-header { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1; }
 .brand { display: flex; align-items: center; gap: 12px; }
-.brand > span:last-child { display: grid; }
-.brand strong { font-size: 17px; letter-spacing: -.02em; }
-.brand small { color: var(--muted); font-size: 12px; margin-top: 2px; }
-.brand-mark { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 13px; color: white; background: var(--rose); font-family: Georgia, serif; font-weight: 700; font-size: 27px; font-style: italic; box-shadow: 0 8px 24px rgba(217,79,121,.24); }
+.brand-logo { width: 86px; height: auto; object-fit: contain; }
+.landing-logo { width: 102px; }
+.brand-context { color: var(--muted); font-size: 12px; padding-left: 12px; border-left: 1px solid var(--border); }
 .secure-pill, .privacy-badge { color: var(--green); background: var(--green-soft); padding: 7px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; }
 .story-copy { margin: auto 0 56px; max-width: 720px; position: relative; z-index: 1; }
 .eyebrow { margin: 0 0 10px; color: var(--rose-dark); text-transform: uppercase; letter-spacing: .12em; font-size: 11px; font-weight: 800; }
@@ -68,7 +67,8 @@ a { color: inherit; text-decoration: none; }
 .app-shell { min-height: 100vh; display: grid; grid-template-columns: 252px minmax(0, 1fr); background: #f8f4f1; }
 .sidebar { position: sticky; top: 0; height: 100vh; padding: 28px 22px 22px; background: #2f2730; color: white; display: flex; flex-direction: column; }
 .brand-sidebar { margin-bottom: 42px; }
-.brand-sidebar small { color: #bdb0b7; }
+.brand-sidebar .brand-logo { width: 98px; filter: drop-shadow(0 5px 12px rgba(0,0,0,.18)); }
+.brand-sidebar .brand-context { color: #bdb0b7; border-left-color: rgba(255,255,255,.18); }
 .side-nav { display: grid; gap: 7px; }
 .side-nav a, .side-nav span { padding: 11px 13px; border-radius: 9px; color: #cdbfc7; font-size: 13px; }
 .side-nav .active { color: white; background: rgba(255,255,255,.09); }
@@ -135,6 +135,8 @@ a { color: inherit; text-decoration: none; }
   .app-shell { display: block; }
   .sidebar { position: static; width: auto; height: auto; padding: 18px; display: grid; grid-template-columns: 1fr auto; align-items: center; }
   .brand-sidebar { margin: 0; }
+  .brand-sidebar .brand-logo { width: 82px; }
+  .brand-sidebar .brand-context { display: none; }
   .side-nav, .sidebar-user { display: none; }
   .sidebar form { grid-column: 2; grid-row: 1; }
   .ghost-button { border-color: rgba(255,255,255,.2); color: white; }

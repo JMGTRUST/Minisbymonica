@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { logout } from "@/app/actions";
 import type { Session } from "@/lib/session";
@@ -15,8 +16,8 @@ export function AppShell({ children, section, session }: AppShellProps) {
     <div className="app-shell">
       <aside className="sidebar">
         <Link className="brand brand-sidebar" href={admin ? "/admin" : "/chofer"}>
-          <span className="brand-mark" aria-hidden>m</span>
-          <span><strong>Minis by Mónica</strong><small>{admin ? "Administración" : "Portal del chofer"}</small></span>
+          <Image className="brand-logo" src="/minis-logo.png" alt="Minis by Mónica" width={100} height={64} priority />
+          <span className="brand-context">{admin ? "Administración" : "Portal del chofer"}</span>
         </Link>
         <nav className="side-nav" aria-label="Navegación principal">
           {admin ? (
