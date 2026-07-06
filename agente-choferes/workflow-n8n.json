@@ -52,7 +52,8 @@
       "name": "Cargar productos",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [-100, 0]
+      "position": [-100, 0],
+      "executeOnce": true
     },
     {
       "parameters": {
@@ -71,7 +72,8 @@
       "name": "Cargar tiendas",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [120, 0]
+      "position": [120, 0],
+      "executeOnce": true
     },
     {
       "parameters": {

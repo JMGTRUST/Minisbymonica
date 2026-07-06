@@ -72,6 +72,7 @@ const Sync = {
       this.estado = 'error';
     }
     App.pintarEstadoSync();
+    if (this.estado === 'enlinea') App.refrescar(); // la vista se dibujo antes de la descarga inicial
   },
 
   /* ---------- Descarga (la base -> la app) ---------- */
@@ -154,9 +155,29 @@ const Sync = {
     };
   },
 
+  /**
+   * Vacia los movimientos de la base y sube el estado local completo.
+   * Lo usan Demo / Reiniciar / Restaurar respaldo en modo compartido: esas
+   * acciones reemplazan los datos de TODOS los dispositivos, no solo este.
+   */
+  async reemplazarTodo() {
+    if (!this.activo()) return;
+    await this.limpiarMovimientos();
+    await this.subirTodo();
+  },
+
+  async limpiarMovimientos() {
+    if (!this.activo()) return;
+    // Los hijos (inventario_visita, despacho_lineas) caen en cascada
+    await this.cliente.from('visitas').delete().gte('id', 0).then(this._error('limpiar-visitas'));
+    await this.cliente.from('despachos').delete().gte('id', 0).then(this._error('limpiar-despachos'));
+    await this.cliente.from('ventas').delete().gte('fecha', '1900-01-01').then(this._error('limpiar-ventas'));
+    await this.cliente.from('alertas').delete().gte('id', 0).then(this._error('limpiar-alertas'));
+  },
+
   async subirTodo() {
     if (!this.activo()) return;
-    await this.pushCatalogos();
+    await this._pushCatalogosAhora(); // primero los catalogos: los movimientos les hacen referencia
     const porFechaTienda = {};
     for (const v of Store.datos.ventas) (porFechaTienda[`${v.fecha}|${v.tiendaId}`] = porFechaTienda[`${v.fecha}|${v.tiendaId}`] || []).push(v);
     for (const grupo of Object.values(porFechaTienda)) {
@@ -168,25 +189,28 @@ const Sync = {
     for (const d of Store.datos.despachos) await this.pushDespacho(d);
   },
 
-  /** Catalogos completos (pocas filas): upsert + borrado de los eliminados */
+  /** Catalogos completos (pocas filas), con debounce: se agenda en cada guardado */
   pushCatalogos() {
     if (!this.activo()) return;
     clearTimeout(this.timers.catalogos);
-    this.timers.catalogos = setTimeout(async () => {
-      const d = Store.datos;
-      await this.cliente.from('choferes').upsert(d.choferes.map((c) => ({ id: c.id, nombre: c.nombre, activo: c.activo }))).then(this._error('choferes'));
-      await this.cliente.from('tiendas').upsert(d.tiendas.map((t) => ({
-        id: t.id, nombre: t.nombre, chofer_id: t.choferId, activo: t.activo, par_override: t.parOverride || {},
-      }))).then(this._error('tiendas'));
-      await this.cliente.from('productos').upsert(d.productos.map((p) => ({
-        id: p.id, codigo: p.codigo, nombre: p.nombre, precio: p.precio, par: p.par,
-        es_producto_tienda: p.conteoChofer, activo: p.activo,
-      }))).then(this._error('productos'));
-      // Borrados (solo pueden borrarse sin historial, asi que es seguro)
-      const ids = (arr) => `(${arr.map((x) => x.id).join(',')})`;
-      if (d.productos.length) await this.cliente.from('productos').delete().not('id', 'in', ids(d.productos)).then(this._error('productos-borrar'));
-      if (d.choferes.length) await this.cliente.from('choferes').delete().not('id', 'in', ids(d.choferes)).then(this._error('choferes-borrar'));
-    }, 1200);
+    this.timers.catalogos = setTimeout(() => this._pushCatalogosAhora(), 1200);
+  },
+
+  async _pushCatalogosAhora() {
+    if (!this.activo()) return;
+    const d = Store.datos;
+    await this.cliente.from('choferes').upsert(d.choferes.map((c) => ({ id: c.id, nombre: c.nombre, activo: c.activo }))).then(this._error('choferes'));
+    await this.cliente.from('tiendas').upsert(d.tiendas.map((t) => ({
+      id: t.id, nombre: t.nombre, chofer_id: t.choferId, activo: t.activo, par_override: t.parOverride || {},
+    }))).then(this._error('tiendas'));
+    await this.cliente.from('productos').upsert(d.productos.map((p) => ({
+      id: p.id, codigo: p.codigo, nombre: p.nombre, precio: p.precio, par: p.par,
+      es_producto_tienda: p.conteoChofer, activo: p.activo,
+    }))).then(this._error('productos'));
+    // Borrados (solo pueden borrarse sin historial, asi que es seguro)
+    const ids = (arr) => `(${arr.map((x) => x.id).join(',')})`;
+    if (d.productos.length) await this.cliente.from('productos').delete().not('id', 'in', ids(d.productos)).then(this._error('productos-borrar'));
+    if (d.choferes.length) await this.cliente.from('choferes').delete().not('id', 'in', ids(d.choferes)).then(this._error('choferes-borrar'));
   },
 
   async pushVentas(fecha, tiendaId, cantidades) {

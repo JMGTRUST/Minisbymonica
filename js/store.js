@@ -50,12 +50,14 @@ const Store = {
 
   reiniciarConEjemplo() {
     this.datos = Seed.crear();
-    this.guardar();
+    this.guardarSoloLocal();
+    if (typeof Sync !== 'undefined') Sync.reemplazarTodo();
   },
 
   cargarDemo() {
     this.datos = Seed.demo();
-    this.guardar();
+    this.guardarSoloLocal();
+    if (typeof Sync !== 'undefined') Sync.reemplazarTodo();
   },
 
   /** true mientras no se haya registrado ningun movimiento (para mostrar la guia de inicio) */
@@ -88,7 +90,8 @@ const Store = {
       throw new Error('El archivo no tiene el formato de respaldo esperado.');
     }
     this.datos = obj;
-    this.guardar();
+    this.guardarSoloLocal();
+    if (typeof Sync !== 'undefined') Sync.reemplazarTodo();
   },
 
   /* ---------- Catalogos ---------- */

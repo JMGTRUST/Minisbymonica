@@ -289,15 +289,19 @@ const Despacho = {
       if (!tiendas.length) continue;
       filas += `<tr class="fila-chofer"><td colspan="${productos.length + 2}">🚚 ${Util.esc(ch.nombre)}</td></tr>`;
       for (const t of tiendas) {
+        // En modo compartido el catalogo puede cambiar entre calcular y dibujar:
+        // una tienda/producto sin linea calculada se muestra vacia, sin romper.
+        if (!porTienda[t.id]) continue;
         const celdas = productos
           .map((p) => {
             const l = porTienda[t.id][p.id];
+            if (!l) return '<td class="num"></td>';
             const titulo = l.criterio === 'par' ? 'Llevar a nivel par (hay conteo de chofer)' : 'Reponer lo vendido';
             return `<td class="num"><input type="number" min="0" inputmode="numeric" class="input-num desp-cant ${l.criterio === 'par' ? 'criterio-par' : ''}"
               title="${titulo} — vendido: ${l.vendido}" data-tienda="${t.id}" data-producto="${p.id}" value="${l.sugerido}"></td>`;
           })
           .join('');
-        const totalTienda = productos.reduce((s, p) => s + porTienda[t.id][p.id].sugerido, 0);
+        const totalTienda = productos.reduce((s, p) => s + ((porTienda[t.id][p.id] || {}).sugerido || 0), 0);
         filas += `<tr><td class="celda-tienda">${Util.esc(t.nombre)}</td>${celdas}<td class="num total-fila" data-tienda="${t.id}">${totalTienda}</td></tr>`;
       }
     }
@@ -331,7 +335,8 @@ const Despacho = {
 
     cont.querySelectorAll('.desp-cant').forEach((inp) =>
       inp.addEventListener('input', () => {
-        const l = porTienda[Number(inp.dataset.tienda)][Number(inp.dataset.producto)];
+        const l = (porTienda[Number(inp.dataset.tienda)] || {})[Number(inp.dataset.producto)];
+        if (!l) return;
         l.sugerido = Math.max(0, Number(inp.value) || 0);
         this.actualizarTotales(cont, porTienda, productos);
       })
@@ -353,7 +358,7 @@ const Despacho = {
   actualizarTotales(cont, porTienda, productos) {
     cont.querySelectorAll('.total-fila').forEach((td) => {
       const tid = Number(td.dataset.tienda);
-      td.textContent = productos.reduce((s, p) => s + porTienda[tid][p.id].sugerido, 0);
+      td.textContent = productos.reduce((s, p) => s + (((porTienda[tid] || {})[p.id] || {}).sugerido || 0), 0);
     });
     let gran = 0;
     cont.querySelectorAll('.total-prod').forEach((td) => {

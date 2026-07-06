@@ -114,10 +114,20 @@ create table if not exists agente_sesiones (
 
 -- ---------- Tiempo real ----------
 -- Publica los cambios para que el panel de la app se actualice al instante.
+-- (idempotente: se puede volver a ejecutar el script sin error)
 
-alter publication supabase_realtime add table
-  choferes, tiendas, productos, ventas, visitas, inventario_visita,
-  despachos, despacho_lineas, alertas;
+do $$
+declare t text;
+begin
+  foreach t in array array['choferes','tiendas','productos','ventas','visitas',
+                           'inventario_visita','despachos','despacho_lineas','alertas']
+  loop
+    begin
+      execute format('alter publication supabase_realtime add table %I', t);
+    exception when duplicate_object then null;
+    end;
+  end loop;
+end $$;
 
 -- ---------- Seguridad (nivel piloto) ----------
 -- RLS activado con políticas abiertas para la llave anónima: suficiente para
@@ -144,12 +154,13 @@ end $$;
 -- /rest/v1/rpc/registrar_visita_agente con {"payload": {...}}.
 
 create or replace function registrar_visita_agente(payload jsonb)
-returns bigint
+returns jsonb
 language plpgsql
 as $$
 declare
   v_id bigint;
-  ahora_rd timestamptz := now() at time zone 'America/Santo_Domingo';
+  -- hora de pared de Republica Dominicana (timestamp sin zona, ya convertido)
+  ahora_rd timestamp := now() at time zone 'America/Santo_Domingo';
   c jsonb;
   a jsonb;
 begin
@@ -186,7 +197,7 @@ begin
     );
   end loop;
 
-  return v_id;
+  return jsonb_build_object('visita_id', v_id);
 end $$;
 
 -- ============================================================================
