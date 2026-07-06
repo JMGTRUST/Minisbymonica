@@ -1,7 +1,8 @@
 /* Minis by Mónica — estilos. Móvil primero: la vista de visitas la usa el chofer en su teléfono. */
 :root {
-  --rosa: #d94f79;
-  --rosa-oscuro: #b83a62;
+  /* Rojo de marca tomado del logo de Minis (#e02b20) */
+  --rosa: #e02b20;
+  --rosa-oscuro: #b31f16;
   --crema: #fdf6f0;
   --tinta: #3a2e35;
   --suave: #8a7a81;
@@ -34,8 +35,8 @@ body {
   top: 0;
   z-index: 10;
 }
-.marca { display: flex; align-items: center; gap: 10px; }
-.logo { font-size: 34px; }
+.marca { display: flex; align-items: center; gap: 12px; }
+.logo { height: 42px; width: auto; }
 .marca h1 { margin: 0; font-size: 20px; color: var(--rosa-oscuro); }
 .marca p { margin: 0; font-size: 13px; color: var(--suave); }
 .nav { display: flex; gap: 4px; overflow-x: auto; padding: 10px 0 0; }

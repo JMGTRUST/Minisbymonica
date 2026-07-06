@@ -5,11 +5,14 @@
  */
 'use strict';
 
-const CACHE = 'minis-reparto-v1.3.1';
+const CACHE = 'minis-reparto-v1.3.2';
 const ARCHIVOS = [
   './',
   './index.html',
   './manifest.webmanifest',
+  './img/logo.png',
+  './img/icono-192.png',
+  './img/icono-512.png',
   './css/styles.css',
   './js/supabase-config.js',
   './js/sync.js',

@@ -90,7 +90,7 @@ js/supabase-config.js  Credenciales del proyecto Supabase (vacío = modo local)
 supabase/esquema.sql   Esquema de la base compartida + datos semilla
 agente-choferes/    Agente de WhatsApp para choferes (n8n + Claude)
 sw.js               Copia sin conexión (solo activa cuando la app está publicada)
-manifest.webmanifest / icono.svg   Instalable en el teléfono del chofer (PWA)
+manifest.webmanifest / img/        Logo e iconos; instalable en el teléfono del chofer (PWA)
 ejemplos/           Reporte de ventas de ejemplo para probar la importación
 pruebas/smoke.js    Prueba de humo end-to-end (npm i playwright-core && node pruebas/smoke.js)
 ```
