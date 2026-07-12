@@ -165,7 +165,7 @@ const Despacho = {
     cont.querySelector('#desp-guardar-manual').addEventListener('click', () => {
       const cantidades = {};
       cont.querySelectorAll('.desp-manual-cant').forEach((inp) => {
-        if (inp.value !== '') cantidades[inp.dataset.producto] = Number(inp.value);
+        cantidades[inp.dataset.producto] = inp.value === '' ? 0 : Number(inp.value);
       });
       Store.registrarVentasTienda(this.fechaVenta, tiendaId, cantidades);
       App.aviso('Ventas guardadas ✔');
@@ -223,10 +223,10 @@ const Despacho = {
         const t = Store.buscarTienda(fila[0]);
         if (!t) { noMatchTiendas.add(fila[0]); continue; }
         ventasPorTienda[t.id] = ventasPorTienda[t.id] || {};
-        fila.slice(1).forEach((celda, i) => {
-          const col = columnas[i];
-          if (!col || !col.producto || celda === '' || celda == null) return;
-          const c = Number(String(celda).replace(',', '.'));
+        columnas.forEach((col, i) => {
+          const celda = fila[i + 1];
+          if (!col || !col.producto) return;
+          const c = celda === '' || celda == null ? 0 : Number(String(celda).replace(',', '.'));
           if (!Number.isFinite(c)) return;
           ventasPorTienda[t.id][col.producto.id] = c;
           celdasLeidas++;
@@ -258,17 +258,58 @@ const Despacho = {
   },
 
   parsearTabla(texto, sepPreferido) {
-    const lineas = String(texto || '').split(/\r?\n/).filter((l) => l.trim() !== '');
-    if (!lineas.length) return [];
-    // Elige el separador que mas columnas produce en la primera linea
+    const entrada = String(texto || '').replace(/^\uFEFF/, '');
+    if (!entrada.trim()) return [];
+    // Elige el separador con más apariciones fuera de comillas en el primer registro.
     const seps = ['\t', ';', ','];
     let sep = sepPreferido;
-    let max = lineas[0].split(sepPreferido).length;
+    let max = -1;
     for (const s of seps) {
-      const n = lineas[0].split(s).length;
+      let n = 0;
+      let entreComillas = false;
+      for (let i = 0; i < entrada.length; i++) {
+        const ch = entrada[i];
+        if (ch === '"') {
+          if (entreComillas && entrada[i + 1] === '"') i++;
+          else entreComillas = !entreComillas;
+        } else if (!entreComillas && (ch === '\n' || ch === '\r')) {
+          break;
+        } else if (!entreComillas && ch === s) {
+          n++;
+        }
+      }
       if (n > max) { max = n; sep = s; }
     }
-    return lineas.map((l) => l.split(sep).map((c) => c.trim().replace(/^"|"$/g, '')));
+
+    const filas = [];
+    let fila = [];
+    let celda = '';
+    let entreComillas = false;
+    for (let i = 0; i < entrada.length; i++) {
+      const ch = entrada[i];
+      if (ch === '"') {
+        if (entreComillas && entrada[i + 1] === '"') {
+          celda += '"';
+          i++;
+        } else {
+          entreComillas = !entreComillas;
+        }
+      } else if (ch === sep && !entreComillas) {
+        fila.push(celda.trim());
+        celda = '';
+      } else if ((ch === '\n' || ch === '\r') && !entreComillas) {
+        if (ch === '\r' && entrada[i + 1] === '\n') i++;
+        fila.push(celda.trim());
+        if (fila.some((valor) => valor !== '')) filas.push(fila);
+        fila = [];
+        celda = '';
+      } else {
+        celda += ch;
+      }
+    }
+    fila.push(celda.trim());
+    if (fila.some((valor) => valor !== '')) filas.push(fila);
+    return filas;
   },
 
   /* ---------- 2. Tabla de despacho editable ---------- */
@@ -289,19 +330,15 @@ const Despacho = {
       if (!tiendas.length) continue;
       filas += `<tr class="fila-chofer"><td colspan="${productos.length + 2}">🚚 ${Util.esc(ch.nombre)}</td></tr>`;
       for (const t of tiendas) {
-        // En modo compartido el catalogo puede cambiar entre calcular y dibujar:
-        // una tienda/producto sin linea calculada se muestra vacia, sin romper.
-        if (!porTienda[t.id]) continue;
         const celdas = productos
           .map((p) => {
             const l = porTienda[t.id][p.id];
-            if (!l) return '<td class="num"></td>';
             const titulo = l.criterio === 'par' ? 'Llevar a nivel par (hay conteo de chofer)' : 'Reponer lo vendido';
             return `<td class="num"><input type="number" min="0" inputmode="numeric" class="input-num desp-cant ${l.criterio === 'par' ? 'criterio-par' : ''}"
               title="${titulo} — vendido: ${l.vendido}" data-tienda="${t.id}" data-producto="${p.id}" value="${l.sugerido}"></td>`;
           })
           .join('');
-        const totalTienda = productos.reduce((s, p) => s + ((porTienda[t.id][p.id] || {}).sugerido || 0), 0);
+        const totalTienda = productos.reduce((s, p) => s + porTienda[t.id][p.id].sugerido, 0);
         filas += `<tr><td class="celda-tienda">${Util.esc(t.nombre)}</td>${celdas}<td class="num total-fila" data-tienda="${t.id}">${totalTienda}</td></tr>`;
       }
     }
@@ -335,8 +372,7 @@ const Despacho = {
 
     cont.querySelectorAll('.desp-cant').forEach((inp) =>
       inp.addEventListener('input', () => {
-        const l = (porTienda[Number(inp.dataset.tienda)] || {})[Number(inp.dataset.producto)];
-        if (!l) return;
+        const l = porTienda[Number(inp.dataset.tienda)][Number(inp.dataset.producto)];
         l.sugerido = Math.max(0, Number(inp.value) || 0);
         this.actualizarTotales(cont, porTienda, productos);
       })
@@ -358,7 +394,7 @@ const Despacho = {
   actualizarTotales(cont, porTienda, productos) {
     cont.querySelectorAll('.total-fila').forEach((td) => {
       const tid = Number(td.dataset.tienda);
-      td.textContent = productos.reduce((s, p) => s + (((porTienda[tid] || {})[p.id] || {}).sugerido || 0), 0);
+      td.textContent = productos.reduce((s, p) => s + porTienda[tid][p.id].sugerido, 0);
     });
     let gran = 0;
     cont.querySelectorAll('.total-prod').forEach((td) => {

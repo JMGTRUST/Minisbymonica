@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Minis by Mónica — Ventas y reparto en tiempo real</title>
-  <meta name="theme-color" content="#e02b20">
+  <title>Minis by Mónica — Piloto de ventas y reparto</title>
+  <meta name="theme-color" content="#d94f79">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="icon" type="image/png" href="img/icono-192.png">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧁</text></svg>">
 </head>
 <body>
   <header class="cabecera no-imprimir">
     <div class="marca">
-      <img class="logo" src="img/logo.png" alt="Minis by Mónica">
+      <span class="logo">🧁</span>
       <div>
         <h1>Minis by Mónica</h1>
-        <p>Sistema de ventas y reparto en tiempo real <span id="estado-sync" class="pill" hidden></span></p>
+        <p>Piloto local de ventas y reparto</p>
       </div>
     </div>
     <nav id="nav" class="nav"></nav>
@@ -27,14 +27,12 @@
   <div id="area-impresion" class="solo-imprimir"></div>
 
   <footer class="pie no-imprimir">
-    Piloto — The Trust for the Americas · v1.3.2 · Sin base compartida configurada, los datos se guardan en este dispositivo; descarga respaldos desde la pestaña “Datos”.
+    Piloto local — The Trust for the Americas · v1.3 · Cada dispositivo guarda sus propios datos; descarga respaldos desde “Datos”.
   </footer>
 
-  <script src="js/supabase-config.js"></script>
   <script src="js/util.js"></script>
   <script src="js/seed.js"></script>
   <script src="js/store.js"></script>
-  <script src="js/sync.js"></script>
   <script src="js/panel.js"></script>
   <script src="js/despacho.js"></script>
   <script src="js/visitas.js"></script>

@@ -27,17 +27,16 @@ const Ayuda = {
         en Configuración). Si no hay conteo, repone lo vendido — igual que el Excel de siempre. Toda cantidad se
         puede corregir a mano antes de confirmar.</p>
         <p><strong>¿Qué pasa si el chofer se queda sin internet?</strong><br>
-        Todo se guarda en el teléfono: los conteos no se pierden al cerrar o recargar la página.
+        Todo se guarda en ese teléfono: los conteos no se pierden al cerrar o recargar la página,
+        pero no se sincronizan automáticamente con otros dispositivos.
         Y cuando la app está publicada en internet, el teléfono guarda una copia la primera vez que la abre,
         así que sigue abriendo aunque no haya señal en el supermercado.</p>
         <p><strong>¿Y si me equivoqué en un conteo o en las ventas?</strong><br>
         Las visitas cerradas se pueden reabrir desde la lista de la ruta (botón <em>Ver → Reabrir</em>), y las
         ventas de una tienda se pueden volver a cargar: lo nuevo reemplaza lo anterior para ese día.</p>
         <p><strong>¿Dónde quedan guardados los datos?</strong><br>
-        Si en la cabecera ves <em>“● En línea — datos compartidos”</em>, todos los dispositivos comparten la misma
-        base y se actualizan entre sí al instante. Si no, cada dispositivo guarda lo suyo localmente. En ambos
-        casos, en <strong>💾 Datos</strong> puedes descargar un respaldo (guárdalo en el Drive) y exportar todo el
-        historial a Excel/CSV. Nada se borra solo, a diferencia de los grupos de WhatsApp.</p>
+        En este dispositivo. En <strong>💾 Datos</strong> puedes descargar un respaldo (guárdalo en el Drive)
+        y exportar todo el historial a Excel/CSV. Nada se borra solo, a diferencia de los grupos de WhatsApp.</p>
         <p><strong>¿Puedo probar sin dañar nada?</strong><br>
         Sí: en <strong>💾 Datos</strong> está <em>Cargar datos de demostración</em> para explorar con un día de
         operación inventado, y <em>Reiniciar</em> para dejar todo limpio cuando vayas a empezar de verdad.</p>

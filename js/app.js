@@ -14,7 +14,6 @@ const App = {
 
   init() {
     Store.init();
-    if (typeof Sync !== 'undefined') Sync.init(); // no bloquea: la app arranca en local y se conecta detras
     // Vuelve a la pestana donde quedo el usuario (el chofer vive en "visitas")
     const ultima = localStorage.getItem('minis_tab');
     if (ultima && this.vistas[ultima]) this.actual = ultima;
@@ -31,37 +30,6 @@ const App = {
     localStorage.setItem('minis_tab', clave);
     document.querySelectorAll('#nav .tab').forEach((b) => b.classList.toggle('activo', b.dataset.vista === clave));
     this.vistas[clave].modulo().render(document.getElementById('vista'));
-  },
-
-  /** Indicador de conexion con la base compartida (solo si esta configurada) */
-  pintarEstadoSync() {
-    const el = document.getElementById('estado-sync');
-    if (!el || typeof Sync === 'undefined') return;
-    const estados = {
-      conectando: ['pill', '⋯ Conectando'],
-      enlinea: ['pill pill-ok', '● En línea — datos compartidos'],
-      error: ['pill pill-error', '⚠ Sin conexión con la base'],
-    };
-    const e = estados[Sync.estado];
-    el.hidden = !e;
-    if (e) {
-      el.className = e[0];
-      el.textContent = e[1];
-    }
-  },
-
-  /**
-   * Re-dibuja la vista actual cuando llegan cambios de otros dispositivos.
-   * Si el usuario esta escribiendo, espera: un re-render le robaria el foco.
-   */
-  refrescar() {
-    const activo = document.activeElement;
-    if (activo && (activo.tagName === 'INPUT' || activo.tagName === 'TEXTAREA') && document.getElementById('vista').contains(activo)) {
-      clearTimeout(this._timerRefrescar);
-      this._timerRefrescar = setTimeout(() => this.refrescar(), 4000);
-      return;
-    }
-    this.vistas[this.actual].modulo().render(document.getElementById('vista'));
   },
 
   /** Aviso flotante breve */

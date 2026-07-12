@@ -154,7 +154,7 @@ const Visitas = {
         const pid = Number(inp.dataset.producto);
         if (inp.value === '') delete visita.conteos[pid];
         else visita.conteos[pid] = Math.max(0, Number(inp.value));
-        Store.guardarVisita(visita);
+        Store.guardar();
         actualizarProgreso();
       })
     );
@@ -173,13 +173,13 @@ const Visitas = {
         const pid = Number(b.dataset.cero);
         visita.conteos[pid] = 0;
         cont.querySelector(`.vis-conteo[data-producto="${pid}"]`).value = '0';
-        Store.guardarVisita(visita);
+        Store.guardar();
         actualizarProgreso();
       })
     );
     cont.querySelector('#vis-notas').addEventListener('input', (e) => {
       visita.notas = e.target.value;
-      Store.guardarVisita(visita);
+      Store.guardar();
     });
     cont.querySelector('#vis-cerrar').addEventListener('click', () => {
       const r = Store.cerrarVisita(visita.id);
@@ -222,7 +222,7 @@ const Visitas = {
     cont.querySelector('#vis-volver').addEventListener('click', () => this.render(cont));
     cont.querySelector('#vis-reabrir').addEventListener('click', () => {
       visita.cerrada = false;
-      Store.guardarVisita(visita);
+      Store.guardar();
       this.visitaActivaId = visita.id;
       this.render(cont);
     });

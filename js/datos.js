@@ -35,8 +35,7 @@ const Datos = {
           <button class="btn btn-peligro" id="dat-reiniciar">Reiniciar (dejar todo limpio)</button>
         </div>
         <p class="ayuda">La demostración llena el sistema con un día de operación inventado para explorar sin miedo.
-        Reiniciar borra todo lo registrado y deja los catálogos de ejemplo. En ambos casos, descarga un respaldo antes.
-        <strong>Con base compartida conectada, estas acciones (y restaurar un respaldo) reemplazan los datos de TODOS los dispositivos.</strong></p>
+        Reiniciar borra todo lo registrado y deja los catálogos de ejemplo. En ambos casos, descarga un respaldo antes.</p>
       </div>
     `;
 

@@ -1,5 +1,5 @@
 /*
- * Panel — visibilidad en tiempo real.
+ * Panel — visibilidad actualizada dentro del dispositivo.
  * La mercancía en consignación es dinero de la empresa parado en las tiendas:
  * el panel muestra el stock estimado por tienda y su valor en RD$.
  */
@@ -124,7 +124,8 @@ const Panel = {
           <li><strong>🏪 Visita de tienda</strong> — el chofer, desde su teléfono, cuenta lo que queda en
             cada tienda. <strong>No puede cerrar la visita sin contar los 13 productos.</strong></li>
         </ol>
-        <p>Con eso, este Panel te muestra al momento cuánta mercancía —y cuánto dinero— tienes en cada tienda.</p>
+        <p>Con eso, este Panel te muestra al momento cuánta mercancía —y cuánto dinero— tienes en cada tienda
+        <strong>en este dispositivo</strong>.</p>
         <div class="acciones">
           <button class="btn btn-primario" id="bienv-demo">🎬 Ver una demostración con datos de prueba</button>
           <button class="btn" id="bienv-config">⚙️ Empezar por la configuración</button>

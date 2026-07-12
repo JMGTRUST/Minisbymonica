@@ -67,12 +67,14 @@ const Seed = {
     }));
 
     return {
-      version: 1,
+      version: 2,
       productos,
       choferes,
       tiendas,
       // Ventas diarias reportadas por los supermercados: {fecha, tiendaId, productoId, cantidad}
       ventas: [],
+      // Permite distinguir "la tienda reportó cero ventas" de "la tienda no ha reportado".
+      reportesVentas: [],
       // Visitas de chofer (Componente B): {id, fecha, hora, tiendaId, choferId, conteos, notas, cerrada}
       visitas: [],
       // Despachos generados (Componente A): {id, fechaVenta, fechaDespacho, generadoEl, lineas, estado}
@@ -99,6 +101,7 @@ const Seed = {
 
     // Ventas de AYER en todas las tiendas
     for (const t of datos.tiendas) {
+      datos.reportesVentas.push({ fecha: ayer, tiendaId: t.id });
       for (const p of datos.productos) {
         const c = cant(t, p, 1);
         if (c > 0) datos.ventas.push({ fecha: ayer, tiendaId: t.id, productoId: p.id, cantidad: c });
@@ -137,6 +140,7 @@ const Seed = {
 
     // Ventas de HOY reportadas por las tiendas de las rutas 1 y 2
     for (const t of datos.tiendas.filter((x) => x.choferId <= 2)) {
+      datos.reportesVentas.push({ fecha: hoy, tiendaId: t.id });
       for (const p of datos.productos) {
         const c = cant(t, p, 2);
         if (c > 0) datos.ventas.push({ fecha: hoy, tiendaId: t.id, productoId: p.id, cantidad: c });
